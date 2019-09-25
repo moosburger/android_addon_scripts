@@ -38,6 +38,10 @@
 #pragma GCC diagnostic pop
 
 
+# Url des Remote Head
+#git config --get remote.origin.url
+
+
 ##########################################################################################################
 # Definitionen
 ##########################################################################################################
@@ -255,7 +259,6 @@ function restorePatches {
 ##########################################################################################################
 ##########################################################################################################
 
-
 ##########################################################################################################
 # Wechsel ins Buildverzeichnis
 ##########################################################################################################
@@ -335,20 +338,32 @@ while : ; do
     ##########################################################################################################
     # meine git Repos synchen
     # test wie es geht,
-    # löschen und clonen, da repo synch es vorher überschrieben hat
+    # löschen und clonen, da repo synch es vorher überschrieben hat?
     # oder
-    # nur synchen (git pull)
-    
+    # nur synchen (git pull)    
     
     ##########################################################################################################
-    # device bg $target synchen
-    #git clone https://github.com/moosburger/android_device_bq_$target.git device/bq/$target
+    echo device/bq/$target synchen
+    rm -rf device/bq/gohan
+    git clone https://github.com/moosburger/android_device_bq_$target.git device/bq/$target
 
-    # external Ant-Wireless synchen
+    echo external/ant-wireless synchen
+    rm -rf external/ant-wireless
     git clone https://github.com/moosburger/android_external_ant-wireless.git external/ant-wireless
 
-    # vendor bg $target synchen
-    git clone https://github.com/moosburger/android_vendor_bq_$target.git vendor/bq/$target
+    echo vendor/bq/$target synchen
+    rm -rf vendor/bq/$target
+    git clone https://github.com/moosburger/android_vendor_bq_$target.git vendor/bq/$target        
+        
+    #Backup aktuellen Pfad
+    lstPath=$PWD
+
+    cd $RootPfad/android/packages/modifizierte
+    echo  die modifizierten Dateien, die in das LOS kopiert werden
+    git pull 
+    
+    #zurück in den Pfad
+    cd $lstPath       
 
     ##########################################################################################################
     # Files austauschen, patchen, hinzufügen
@@ -359,39 +374,34 @@ while : ; do
     if [ $target = gohan  ]
     then
         echo Ant+        
-        grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-        searchString="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax</string>"
-        replaceWith="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax,ant</string>"
-        sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+        #~ grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
+        #~ searchString="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax</string>"
+        #~ replaceWith="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax,ant</string>"
+        #~ sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+        #~ grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
         
-        grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-        searchString="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc</string>"
-        replaceWith="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc,ant</string>"
-        sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+        #~ grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
+        #~ searchString="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc</string>"
+        #~ replaceWith="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc,ant</string>"
+        #~ sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+        #~ grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+        #~ echo
+        cp $RootPfad/android/packages/modifizierte/airplane_defaults.xml ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
+        echo        
     fi
        
     echo gps.conf im Ordner austauschen
-    cp $RootPfad/android/packages/modifizierte/gps.conf $RootPfad/android/lineage14.1/device/bq/$target/gps/etc/gps.conf
+    cp $RootPfad/android/packages/modifizierte/gps.conf ./device/bq/$target/gps/etc/gps.conf
     echo    
     
-    echo BqCamera  aktualisieren, wenn neu. da in Github eingecheckt brauchts dies nicht mehr
-    cp $RootPfad/android/packages/modifizierte/cm_strings.xml $RootPfad/android/lineage14.1/packages/apps/Settings/res/values-de/cm_strings.xml
-    echo
+    echo die Lautstaerke Aenderungen und die VPN Uebersetzungen
+    cp $RootPfad/android/packages/modifizierte/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml    
+    cp $RootPfad/android/packages/modifizierte/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
     
-    echo BqCamera  aktualisieren, wenn neu. da in Github eingecheckt brauchts dies nicht mehr
-    cp $RootPfad/android/packages/modifizierte/default_volume_tables.xml $RootPfad/ndroid/lineage14.1/frameworks/av/services/audiopolicy/config/default_volume_tables.xml
-    echo
-    
-       
-    #echo BqCamera  aktualisieren, wenn neu. da in Github eingecheckt brauchts dies nicht mehr
-    #cp $RootPfad/android/packages/priv-app/BqCamera/BqCamera.apk $RootPfad/android/lineage14.1/vendor/bq/$target/proprietary/priv-app/BqCamera/BqCamera.apk
-    #echo
-        
     echo +++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++++++++++++
     echo
-
+    
+    exit
     ##########################################################################################################
     # Build
     ##########################################################################################################
