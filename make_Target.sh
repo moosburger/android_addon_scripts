@@ -136,7 +136,7 @@ function showFeature {
 # details               Beenden
 ##########################################################################################################
 function quit {
-    echo $1 & "  schlug fehl"
+    echo - $1 & "  schlug fehl"
     exit
 }
 
@@ -149,7 +149,7 @@ function securityPatchDate {
     echo
     #grep "PLATFORM_SECURITY_PATCH := " ./build/core/version_defaults.mk 
     LOCAL=$(grep -Eoi "PLATFORM_SECURITY_PATCH := .*" ./build/core/version_defaults.mk | sed  s@'PLATFORM_SECURITY_PATCH := '@''@)
-    echo Security Patch Level lokal vom  : $LOCAL
+    echo -  Security Patch Level lokal vom  : $LOCAL
     echo
 }
 
@@ -163,18 +163,18 @@ function newPatchesAvailable {
     LOCAL=$(grep -Eoi "PLATFORM_SECURITY_PATCH := .*" ./build/core/version_defaults.mk | sed  s@'PLATFORM_SECURITY_PATCH := '@''@)
     REMOTE=$(curl -sS https://github.com/LineageOS/android_build/blob/cm-14.1/core/version_defaults.mk | grep -Eoi 'PLATFORM_SECURITY_PATCH</span> := [0-9]{4}-[0-9]{2}-[0-9]{2}' | sed  s@'PLATFORM_SECURITY_PATCH</span> := '@''@)
 
-    echo Security Patch Level lokal vom  : $LOCAL
-    echo Security Patch Level remote vom: $REMOTE    
+    echo - Security Patch Level lokal vom  : $LOCAL
+    echo - Security Patch Level remote vom: $REMOTE    
     
     # wenn länge = 0 keine verbindung zum server
     if [ ${#REMOTE} = 0 ]
     then
-        echo "Keine Verbindung zum Server"
+        echo - Keine Verbindung zum Server
         exit
     fi    
     if [ ${#LOCAL} = 0 ] 
     then
-        echo "Kein Repo gefunden, starte sync"
+        echo - Kein Repo gefunden, starte sync
         return
     fi    
 
@@ -182,14 +182,14 @@ function newPatchesAvailable {
         xmessage -buttons "Trotzdem bauen":0,"Beenden":1 -default "Beenden" -nearmouse "Keine neuen Patches vorhanden"
         if [ $? = 1 ] 
         then
-            echo "Beenden"
+            echo - Beenden
             exit
         fi
     else
         xmessage -buttons "Build!":0,"Beenden":1 -default "Beenden" -nearmouse "Neue Patches vorhanden"
         if [ $? = 1 ] 
         then
-            echo "Beenden"
+            echo - Beenden
             exit
         fi
     fi
@@ -206,7 +206,7 @@ function prepCache {
     
     if [ $clearBuild = true ] && [ -d "$RootPfad/android/lineage14.1/out" ]
     then
-        echo "out geloescht"
+        echo - out geloescht
         rm -r $RootPfad/android/lineage14.1/out
     fi
     
@@ -226,30 +226,12 @@ function prepCache {
 ##########################################################################################################
 function restorePatches {
     echo
-    echo "Parameter wieder zuruecksetzen"
     
+    echo - Anzahl Prozessoren
     # Die Buildumgebung wieder zurück
     replaceWith="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j\$(grep \"\^processor\" /proc/cpuinfo | wc -l) \"\$@\""
     searchString="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j4 \"\$@\""
-    #searchString="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j1 \"\$@\""
     sed -i -e "s:${searchString}:${replaceWith}:g" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh
-
-    echo Anzahl Prozessoren
-    grep -Eoi "mk_timer schedtool -B -n 10 -e ionice .*" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh 
-    
-    echo Ant+        
-    grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-    searchString="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax,ant</string>"
-    replaceWith="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax</string>"
-    sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-    grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-    
-    grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-    searchString="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc,ant</string>"
-    replaceWith="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc</string>"
-    sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-    grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-
 }
 
 ##########################################################################################################
@@ -291,7 +273,7 @@ fi
 
 echo +++++++++++++++++++++++++++++++++++ Sync Repo  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo
-echo sync
+echo  - sync
 repo sync
 if [ $? -ne 0 ] 
 then
@@ -312,6 +294,7 @@ while : ; do
     echo +++++++++++++++++++++++++++++++++++ Den Code fuer $target   +++++++++++++++++++++++++++++++++++++++++
     echo
     source build/envsetup.sh
+    #syncht den Code für gohan oder tenshi
     breakfast $target
     echo
     if [ $? -ne 0 ] 
@@ -336,31 +319,43 @@ while : ; do
     fi
 
     ##########################################################################################################
-    # meine git Repos synchen
-    # test wie es geht,
-    # löschen und clonen, da repo synch es vorher überschrieben hat?
-    # oder
-    # nur synchen (git pull)    
-    
+    # meine git Repos synchen    
     ##########################################################################################################
-    echo device/bq/$target synchen
-    rm -rf device/bq/gohan
-    git clone https://github.com/moosburger/android_device_bq_$target.git device/bq/$target
+    #~ echo - device/bq/$target synchen
+    #~ rm -rf device/bq/gohan
+    #~ git clone https://github.com/moosburger/android_device_bq_$target.git device/bq/$target
+    #~ git config --get remote.origin.url
 
-    echo external/ant-wireless synchen
-    rm -rf external/ant-wireless
-    git clone https://github.com/moosburger/android_external_ant-wireless.git external/ant-wireless
+    #~ echo - external/ant-wireless synchen
+    #~ rm -rf external/ant-wireless
+    #~ git clone https://github.com/moosburger/android_external_ant-wireless.git external/ant-wireless
+    #~ git config --get remote.origin.url
 
-    echo vendor/bq/$target synchen
-    rm -rf vendor/bq/$target
-    git clone https://github.com/moosburger/android_vendor_bq_$target.git vendor/bq/$target        
-        
     #Backup aktuellen Pfad
-    lstPath=$PWD
+    lstPath=$PWD   
+    
+    if [ $target = gohan  ]
+    then
+        echo - device/bq/$target synchen
+        cd $RootPfad/android/packages/android_device_bq_$target
+        git config --get remote.origin.url
+        git pull    
+    fi
 
+    echo - external/ant-wireless synchen
+    cd $RootPfad/android/packages/android_external_ant-wireless
+    git config --get remote.origin.url
+    git pull    
+
+    echo - vendor/bq/$target synchen
+    cd $RootPfad/android/lineage14.1/vendor/bq/$target        
+    git config --get remote.origin.url
+    git pull    
+    
+    echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/android/packages/modifizierte
-    echo  die modifizierten Dateien, die in das LOS kopiert werden
-    git pull 
+    git config --get remote.origin.url
+    git pull
     
     #zurück in den Pfad
     cd $lstPath       
@@ -373,55 +368,54 @@ while : ; do
     
     if [ $target = gohan  ]
     then
-        echo Ant+        
-        #~ grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-        #~ searchString="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax</string>"
-        #~ replaceWith="<string name=\"def_airplane_mode_radios\" translatable=\"false\">cell,bluetooth,wifi,nfc,wimax,ant</string>"
-        #~ sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        #~ grep -Eoi '<string name="def_airplane_mode_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        
-        #~ grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-        #~ searchString="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc</string>"
-        #~ replaceWith="<string name=\"airplane_mode_toggleable_radios\" translatable=\"false\">bluetooth,wifi,nfc,ant</string>"
-        #~ sed -i -e "s:${searchString}:${replaceWith}:g" ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        #~ grep -Eoi '<string name="airplane_mode_toggleable_radios" translatable.*'  ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-        #~ echo
+        echo - Ant+   
         cp $RootPfad/android/packages/modifizierte/airplane_defaults.xml ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
-        echo        
-    fi
-       
-    echo gps.conf im Ordner austauschen
-    cp $RootPfad/android/packages/modifizierte/gps.conf ./device/bq/$target/gps/etc/gps.conf
-    echo    
+        
+        echo - device/bq/$target kopieren
+        rm -rf device/bq/gohan
+        cp -r $RootPfad/android/packages/android_device_bq_gohan/ ./device/bq/gohan/
+        rm -rf device/bq/gohan/.git        
+    fi    
     
-    echo die Lautstaerke Aenderungen und die VPN Uebersetzungen
+    if [ $target = tenshi  ]
+    then  
+        echo  - gps.conf im Ordner austauschen
+        cp $RootPfad/android/packages/modifizierte/gps.conf ./device/bq/msm8937-common/gps/etc/gps.conf
+        cp $RootPfad/android/packages/modifizierte/tenshi.system.prop ./device/bq/msm8937-common/system.prop
+    fi
+    
+    echo - external/ant-wireless kopieren
+    rm -rf external/ant-wireless
+    cp -r $RootPfad/android/packages/android_external_ant-wireless/ ./external/ant-wireless/
+    rm -rf external/ant-wireless/.git
+
+    echo - die Lautstaerke Aenderungen und die VPN Uebersetzungen
     cp $RootPfad/android/packages/modifizierte/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml    
     cp $RootPfad/android/packages/modifizierte/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
     
     echo +++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++++++++++++
     echo
-    
-    exit
+exit    
     ##########################################################################################################
     # Build
     ##########################################################################################################
-    echo +++++++++++++++++++++++++++++++++++ Starte unsignierten Build  ++++++++++++++++++++++++++++++++++++++
+    echo +++++++++++++++++++++++++++++++++++ Starte unsignierten Build  fuer $target ++++++++++++++++++++++++++++++++++++++
     echo
     croot
     brunch $target
     if [ $? -ne 0 ] 
     then
-        echo "brunch $target schlug fehl"
+        echo - brunch $target schlug fehl
         break
     fi
     echo +++++++++++++++++++++++++++++++++++ Ende unsignierter Build  ++++++++++++++++++++++++++++++++++++++++
     echo
-    echo +++++++++++++++++++++++++++++++++++ Starte signierten Build  ++++++++++++++++++++++++++++++++++++++++
+    echo +++++++++++++++++++++++++++++++++++ Starte signierten Build  fuer $target ++++++++++++++++++++++++++++++++++++++++
     echo
     mka target-files-package otatools
     if [ $? -ne 0 ] 
     then
-        echo "otatools $target schlug fehl"
+        echo - otatools $target schlug fehl
         break
     fi
     echo
@@ -431,7 +425,7 @@ while : ; do
     python ./build/tools/releasetools/sign_target_files_apks -o -d $CertPfad/.android-certs $OUT/obj/PACKAGING/target_files_intermediates/*-target_files-*.zip $RootPfad/$target-files-signed.zip 
     if [ $? -ne 0 ]
     then
-        echo "$target APK signieren schlug fehl"
+        echo - $target APK signieren schlug fehl
         break
     fi
     echo
@@ -440,7 +434,7 @@ while : ; do
     python ./build/tools/releasetools/ota_from_target_files -k $CertPfad/.android-certs/releasekey --block --backup=true $RootPfad/$target-files-signed.zip $RootPfad/$target-ota-update.zip
     if [ $? -ne 0 ]
     then
-        echo "$target OTA signieren schlug fehl"
+        echo - $target OTA signieren schlug fehl
         break
     fi
     echo
@@ -463,15 +457,15 @@ fi
 # Kopieren und umbenennen
 if [ -f $RootPfad/$target-ota-update.zip ]
 then
-    echo "verschiebe $RootPfad/$target-ota-update.zip ==> $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip"
+    echo - verschiebe $RootPfad/$target-ota-update.zip ==> $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip
     mv $RootPfad/$target-ota-update.zip $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip
 fi
 
 if [ -f $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ]
 then
-    echo "verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip"
+    echo - verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip
     mv $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip $RootPfad
-    echo "verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum"
+    echo - verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum
     mv $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum $RootPfad
 fi
 
