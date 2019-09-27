@@ -232,6 +232,8 @@ function restorePatches {
     replaceWith="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j\$(grep \"\^processor\" /proc/cpuinfo | wc -l) \"\$@\""
     searchString="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j4 \"\$@\""
     sed -i -e "s:${searchString}:${replaceWith}:g" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh
+    #auslesen
+    grep -Eoi "mk_timer schedtool -B -n 10 -e ionice .*" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh 
 }
 
 ##########################################################################################################
@@ -374,7 +376,12 @@ while : ; do
         echo - device/bq/$target kopieren
         rm -rf device/bq/gohan
         cp -r $RootPfad/android/packages/android_device_bq_gohan/ ./device/bq/gohan/
-        rm -rf device/bq/gohan/.git        
+        rm -rf device/bq/gohan/.git      
+        
+        echo - BqKamera Hack
+        rm -rf frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+        cp $RootPfad/android/packages/modifizierte/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+        
     fi    
     
     if [ $target = tenshi  ]
