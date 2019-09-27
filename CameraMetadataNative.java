@@ -329,12 +329,12 @@ public class CameraMetadataNative implements Parcelable {
      * @hide
      */
     public <T> T get(CaptureResult.Key<T> key) {
-+        try {
-+            return get(key.getNativeKey());
-+        } catch (Exception e) {
-+            // Ignore this error
-+            return null;
-+        }
+        try {
+            return get(key.getNativeKey());
+        } catch (Exception e) {
+            // Ignore this error
+            return null;
+        }
     }
 
     /**
