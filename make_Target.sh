@@ -233,7 +233,7 @@ function restorePatches {
     searchString="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j4 \"\$@\""
     sed -i -e "s:${searchString}:${replaceWith}:g" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh
     #auslesen
-    grep -Eoi "mk_timer schedtool -B -n 10 -e ionice .*" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh 
+    #grep -Eoi "mk_timer schedtool -B -n 10 -e ionice .*" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh 
 }
 
 ##########################################################################################################
@@ -342,6 +342,11 @@ while : ; do
         cd $RootPfad/android/packages/android_device_bq_$target
         git config --get remote.origin.url
         git pull    
+        
+        echo - kernel/bq/msm8976 synchen
+        cd $RootPfad/android/packages/android_kernel_bq_msm8976
+        git config --get remote.origin.url
+        git pull    
     fi
 
     echo - external/ant-wireless synchen
@@ -352,7 +357,7 @@ while : ; do
     echo - vendor/bq/$target synchen
     cd $RootPfad/android/lineage14.1/vendor/bq/$target        
     git config --get remote.origin.url
-    git pull    
+    git pull 
     
     echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/android/packages/modifizierte
@@ -378,19 +383,23 @@ while : ; do
         cp -r $RootPfad/android/packages/android_device_bq_gohan/ ./device/bq/gohan/
         rm -rf device/bq/gohan/.git      
         
-        echo - BqKamera Hack
-        rm -rf frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
-        cp $RootPfad/android/packages/modifizierte/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
-        
+        echo - kernel/bq/msm8976 kopieren
+        rm -rf kernel/bq/msm8976
+        cp -r $RootPfad/android/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
+        rm -rf kernel/bq/msm8976/.git              
     fi    
     
     if [ $target = tenshi  ]
     then  
         echo  - gps.conf im Ordner austauschen
         cp $RootPfad/android/packages/modifizierte/gps.conf ./device/bq/msm8937-common/gps/etc/gps.conf
-        cp $RootPfad/android/packages/modifizierte/tenshi.system.prop ./device/bq/msm8937-common/system.prop
+        cp $RootPfad/android/packages/modifizierte/msm8937.dtsi ./device/bq/msm8937-common/msm8937.dtsi    
     fi
-    
+       
+    echo - BqKamera Hack
+    rm -rf frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+    cp $RootPfad/android/packages/modifizierte/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+        
     echo - external/ant-wireless kopieren
     rm -rf external/ant-wireless
     cp -r $RootPfad/android/packages/android_external_ant-wireless/ ./external/ant-wireless/
