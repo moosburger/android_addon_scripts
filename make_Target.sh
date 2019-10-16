@@ -1,25 +1,8 @@
 #!/bin/bash
 
 ##########################################################################################################
-#~ bug in icst.c in arch/arm/common
-#~ Repo nur cm14.1 auschecken
-#~ Umbau, wenn gohan alle Patches einspielen, Frage ob alle Proz oder nur 4, CleanBuild heißt löschen des $Out Verzeichnisses
+#
 ##########################################################################################################
-
-    #~ <string name="data_usage_app_restrict_all_vpn_title">Alle VPN Datenzugriffe deaktivieren</string>
-    #~ <string name="data_usage_app_restrict_all_vpn_summary">Jegliche Datenzugriffe über VPN verhindern</string>        
-    #~ <string name="data_usage_app_restrict_vpn_category_title">VPN-Datenzugriff</string>
-    #~ in /media/lta-user/Backup/android/lineage14.1/packages/apps/Settings/res/values-de/cm_strings.xml
-
-#~ Audio einstellungen liegn im Pfad
-    #~ android/lineage14.1/frameworks/av/services/audiopolicy/config/
-
-#~ <Compiler festnageln>
-        #~ https://askubuntu.com/questions/873278/linux-kernel-version-and-gcc-version-match
-        #~ https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/?id=refs/tags/v3.10.108
-        #~ https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/README?id=refs/tags/v3.10.108
-#~ <Compiler festnageln>
-
 #~ <HID-Voice und VoLTE unterschiede Leeco/14/16 nach gohan>
         #~ /media/lta-user/Backup/android/DeviceSpecific/android_device_leeco_s2/overlay/frameworks/base/core/res/res/values/config.xml
 	#~ /media/lta-user/Backup/android/DeviceSpecific/android_device_leeco_s2/audio/audio_platform_info.xml
@@ -29,17 +12,10 @@
 	#~ /media/lta-user/Backup/android/DeviceSpecific/android_device_bq_gohan/audio/mixer_paths_qrd_skun.xml
 #~ <HID-Voice und VoLTE unterschiede Leeco/14/16 nach gohan>
 
-	#~ fastcharge aus cyclon kernel
-
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-
 #pragma GCC diagnostic pop
-
-
-# Url des Remote Head
-#git config --get remote.origin.url
 
 
 ##########################################################################################################
@@ -71,7 +47,7 @@ kernel=msm8976
 # details               Auswahl des zu bauenden Bq Targets
 ##########################################################################################################
 function getTarget {
-    xmessage -buttons "gohan":0,"tenshi":1 -default "gohan" -nearmouse "Target auswählen"
+    xmessage -buttons "gohan":0,"tenshi":1 -default "gohan" -nearmouse "Target auswaehlen"
     if [ $? = 1 ] 
     then
         target=tenshi
@@ -98,7 +74,7 @@ function limitUsedCpu {
 # details               weitere Apps
 ##########################################################################################################
 function cleanBuild {
-    xmessage -buttons "Nein":0,"Ja":1 -default "Nein" -nearmouse "Den Build Ordner vorher löschen?"
+    xmessage -buttons "Nein":0,"Ja":1 -default "Nein" -nearmouse "Den Build Ordner vorher loeschen?"
     if [ $? = 1 ] 
     then
         clearBuild=true
@@ -111,10 +87,10 @@ function cleanBuild {
 ##########################################################################################################
 function showFeature {
     
-    msgBuild="nicht gelöscht"
+    msgBuild="nicht geloescht"
     if [ $clearBuild = true ]
     then
-        msgBuild="gelöscht"
+        msgBuild="geloescht"
     fi
     
     msgCpu="unbegrenzt"
@@ -145,7 +121,7 @@ function quit {
 # details               der PatchStand auf der Platte
 ##########################################################################################################
 function securityPatchDate {
-    echo +++++++++++++++++++++++++++++++++++ Patch Datum +++++++++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Patch Datum +++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     #grep "PLATFORM_SECURITY_PATCH := " ./build/core/version_defaults.mk 
     LOCAL=$(grep -Eoi "PLATFORM_SECURITY_PATCH := .*" ./build/core/version_defaults.mk | sed  s@'PLATFORM_SECURITY_PATCH := '@''@)
@@ -158,7 +134,7 @@ function securityPatchDate {
 # details               gibts einen neueren PatchStand
 ##########################################################################################################
 function newPatchesAvailable {
-    echo +++++++++++++++++++++++++++++++++++ Security Patches ++++++++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Security Patches ++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     LOCAL=$(grep -Eoi "PLATFORM_SECURITY_PATCH := .*" ./build/core/version_defaults.mk | sed  s@'PLATFORM_SECURITY_PATCH := '@''@)
     REMOTE=$(curl -sS https://github.com/LineageOS/android_build/blob/cm-14.1/core/version_defaults.mk | grep -Eoi 'PLATFORM_SECURITY_PATCH</span> := [0-9]{4}-[0-9]{2}-[0-9]{2}' | sed  s@'PLATFORM_SECURITY_PATCH</span> := '@''@)
@@ -166,7 +142,7 @@ function newPatchesAvailable {
     echo - Security Patch Level lokal vom  : $LOCAL
     echo - Security Patch Level remote vom: $REMOTE    
     
-    # wenn länge = 0 keine verbindung zum server
+    # wenn laenge = 0 keine verbindung zum server
     if [ ${#REMOTE} = 0 ]
     then
         echo - Keine Verbindung zum Server
@@ -197,10 +173,10 @@ function newPatchesAvailable {
 
 ##########################################################################################################
 # FunktionsName prepCache
-# details               Cache löschen und vorbereiten
+# details               Cache loeschen und vorbereiten
 ##########################################################################################################
 function prepCache {
-    echo +++++++++++++++++++++++++++++++++++ Cleanup Cache  ++++++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache  ++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     ccache -C 
     
@@ -211,7 +187,7 @@ function prepCache {
     fi
     
     echo
-    echo +++++++++++++++++++++++++++++++++++ Cleanup Cache  beendet ++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache  beendet ++++++++++++++++++++++++++++++++++++++"
     # Cache Einstellungen
     export USE_CCACHE=1
     #ccache -M 75G
@@ -222,13 +198,13 @@ function prepCache {
 
 ##########################################################################################################
 # FunktionsName restorePatches
-# details               die geänderten Scripte wiederherstellen
+# details               die geaenderten Scripte wiederherstellen
 ##########################################################################################################
 function restorePatches {
     echo
     
     echo - Anzahl Prozessoren
-    # Die Buildumgebung wieder zurück
+    # Die Buildumgebung wieder zurueck
     replaceWith="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j\$(grep \"\^processor\" /proc/cpuinfo | wc -l) \"\$@\""
     searchString="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j4 \"\$@\""
     sed -i -e "s:${searchString}:${replaceWith}:g" $RootPfad/android/lineage14.1/vendor/cm/build/envsetup.sh
@@ -246,18 +222,18 @@ function restorePatches {
 ##########################################################################################################
 # Wechsel ins Buildverzeichnis
 ##########################################################################################################
-echo +++++++++++++++++++++++++++++++++++ In das Buildverzeichnis +++++++++++++++++++++++++++++++++++++++++
+echo "+++++++++++++++++++++++++++++++++++ In das Buildverzeichnis +++++++++++++++++++++++++++++++++++++++++"
 echo
 cd $RootPfad/android/lineage14.1
 pwd
 echo
 # gibts neue security patches
 newPatchesAvailable
-# für welches Target bauen wir
+# fuer welches Target bauen wir
 getTarget
 # Prozessoren begrenzen
 limitUsedCpu
-# BuildOrdner löschen
+# BuildOrdner loeschen
 cleanBuild
 #Zusammenfassung
 showFeature
@@ -265,7 +241,7 @@ showFeature
 ##########################################################################################################
 # Repo init und sync
 ##########################################################################################################
-echo +++++++++++++++++++++++++++++++++++ Init Repo  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo "+++++++++++++++++++++++++++++++++++ Init Repo  ++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 repo init -u https://github.com/LineageOS/android.git -b cm-14.1
 echo
 if [ $? -ne 0 ] 
@@ -273,7 +249,7 @@ then
     quit "repo Init"
 fi
 
-echo +++++++++++++++++++++++++++++++++++ Sync Repo  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo "+++++++++++++++++++++++++++++++++++ Sync Repo  ++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
 echo  - sync
 repo sync
@@ -293,10 +269,10 @@ securityPatchDate
 ##########################################################################################################
 while : ; do
 
-    echo +++++++++++++++++++++++++++++++++++ Den Code fuer $target   +++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Den Code fuer $target   +++++++++++++++++++++++++++++++++++++++++"
     echo
     source build/envsetup.sh
-    #syncht den Code für gohan oder tenshi
+    #syncht den Code fuer gohan oder tenshi
     breakfast $target
     echo
     if [ $? -ne 0 ] 
@@ -341,36 +317,41 @@ while : ; do
         echo - device/bq/$target synchen
         cd $RootPfad/android/packages/android_device_bq_$target
         git config --get remote.origin.url
+        git branch | grep \* | cut -d ' ' -f2
         git pull    
         
         echo - kernel/bq/msm8976 synchen
         cd $RootPfad/android/packages/android_kernel_bq_msm8976
         git config --get remote.origin.url
+        git branch | grep \* | cut -d ' ' -f2
         git pull    
     fi
 
     echo - external/ant-wireless synchen
     cd $RootPfad/android/packages/android_external_ant-wireless
     git config --get remote.origin.url
+    git branch | grep \* | cut -d ' ' -f2
     git pull    
 
     echo - vendor/bq/$target synchen
     cd $RootPfad/android/lineage14.1/vendor/bq/$target        
     git config --get remote.origin.url
+    git branch | grep \* | cut -d ' ' -f2
     git pull 
     
     echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/android/packages/modifizierte
     git config --get remote.origin.url
+    git branch | grep \* | cut -d ' ' -f2
     git pull
     
-    #zurück in den Pfad
+    #zurueck in den Pfad
     cd $lstPath       
 
     ##########################################################################################################
-    # Files austauschen, patchen, hinzufügen
+    # Files austauschen, patchen, hinzufuegen
     ##########################################################################################################
-    echo +++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen   +++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen   +++++++++++++++++++++++++++++++"
     echo
     
     if [ $target = gohan  ]
@@ -386,7 +367,7 @@ while : ; do
         echo - kernel/bq/msm8976 kopieren
         rm -rf kernel/bq/msm8976
         cp -r $RootPfad/android/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
-        rm -rf kernel/bq/msm8976/.git              
+        rm -rf kernel/bq/msm8976/.git     
     fi    
     
     if [ $target = tenshi  ]
@@ -409,13 +390,13 @@ while : ; do
     cp $RootPfad/android/packages/modifizierte/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml    
     cp $RootPfad/android/packages/modifizierte/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
     
-    echo +++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++++++++++++"
     echo
 #exit    
     ##########################################################################################################
     # Build
     ##########################################################################################################
-    echo +++++++++++++++++++++++++++++++++++ Starte unsignierten Build  fuer $target ++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Starte unsignierten Build  fuer $target ++++++++++++++++++++++++++++++++++++++"
     echo
     croot
     brunch $target
@@ -424,9 +405,9 @@ while : ; do
         echo - brunch $target schlug fehl
         break
     fi
-    echo +++++++++++++++++++++++++++++++++++ Ende unsignierter Build  ++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Ende unsignierter Build  ++++++++++++++++++++++++++++++++++++++++"
     echo
-    echo +++++++++++++++++++++++++++++++++++ Starte signierten Build  fuer $target ++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Starte signierten Build  fuer $target ++++++++++++++++++++++++++++"
     echo
     mka target-files-package otatools
     if [ $? -ne 0 ] 
@@ -435,7 +416,7 @@ while : ; do
         break
     fi
     echo
-    echo +++++++++++++++++++++++++++++++++++ APK +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ APK +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     croot
     python ./build/tools/releasetools/sign_target_files_apks -o -d $CertPfad/.android-certs $OUT/obj/PACKAGING/target_files_intermediates/*-target_files-*.zip $RootPfad/$target-files-signed.zip 
@@ -445,7 +426,7 @@ while : ; do
         break
     fi
     echo
-    echo +++++++++++++++++++++++++++++++++++ OTA +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ OTA +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     python ./build/tools/releasetools/ota_from_target_files -k $CertPfad/.android-certs/releasekey --block --backup=true $RootPfad/$target-files-signed.zip $RootPfad/$target-ota-update.zip
     if [ $? -ne 0 ]
@@ -454,7 +435,7 @@ while : ; do
         break
     fi
     echo
-    echo +++++++++++++++++++++++++++++++++++ Ende signierter Build  ++++++++++++++++++++++++++++++++++++++++++
+    echo "+++++++++++++++++++++++++++++++++++ Ende signierter Build  ++++++++++++++++++++++++++++++++++++++++++"
     echo
     
 break
@@ -473,15 +454,15 @@ fi
 # Kopieren und umbenennen
 if [ -f $RootPfad/$target-ota-update.zip ]
 then
-    echo - verschiebe $RootPfad/$target-ota-update.zip ==> $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip
+    echo "verschiebe $RootPfad/$target-ota-update.zip ==> $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip"
     mv $RootPfad/$target-ota-update.zip $RootPfad/lineage-14.1-$buildDate-UNOFFICIAL-$target-signed.zip
 fi
 
 if [ -f $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ]
 then
-    echo - verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip
+    echo "verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip"
     mv $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip $RootPfad
-    echo - verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum
+    echo "verschiebe $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum ==> $RootPfad/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum"
     mv $OUT/lineage-14.1-*-UNOFFICIAL-$target.zip.md5sum $RootPfad
 fi
 
