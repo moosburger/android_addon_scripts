@@ -1,14 +1,22 @@
 # android_addon_scripts
-Version 1.0.0
+Version 1.1.0
 
 modifizierte Dateien im LOS 14.1
 
-Übersetzungen ins Deutsche
-in lineage14.1/packages/apps/Settings/res/values-de/cm_strings.xml
+Folder Ant+
 
+Folder CameraHack
+in ineage14.1/frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+
+Folder Gps
+
+Folder Loudness
 Audio Einstellungen um noch leiser einstellen zu können. build Prop ermöglicht 30 Stufen
 in lineage14.1/packages/apps/Settings/res/values-de/default_volume_tables.xml
 
-BqKamera Hack
-in ineage14.1/frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
-        
+Folder microG
+
+Folder Tenshi
+
+Folder Translations
+in lineage14.1/packages/apps/Settings/res/values-de/cm_strings.xml

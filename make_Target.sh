@@ -176,7 +176,7 @@ function newPatchesAvailable {
 # details               Cache loeschen und vorbereiten
 ##########################################################################################################
 function prepCache {
-    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache  ++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache ++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     ccache -C 
     
@@ -187,7 +187,7 @@ function prepCache {
     fi
     
     echo
-    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache  beendet ++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++ Cleanup Cache beendet ++++++++++++++++++++++++++++++++++++++"
     # Cache Einstellungen
     export USE_CCACHE=1
     #ccache -M 75G
@@ -253,6 +253,7 @@ echo "+++++++++++++++++++++++++++++++++++ Sync Repo  +++++++++++++++++++++++++++
 echo
 echo  - sync
 repo sync
+echo
 if [ $? -ne 0 ] 
 then
     quit "repo sync"
@@ -318,32 +319,42 @@ while : ; do
         cd $RootPfad/android/packages/android_device_bq_$target
         git config --get remote.origin.url
         git branch | grep \* | cut -d ' ' -f2
-        git pull    
+        git tag | head -2 | tail -1
+        git pull
+        git tag | head -2 | tail -1
         
         echo - kernel/bq/msm8976 synchen
         cd $RootPfad/android/packages/android_kernel_bq_msm8976
         git config --get remote.origin.url
         git branch | grep \* | cut -d ' ' -f2
-        git pull    
+        git tag | head -2 | tail -1
+        git pull
+        git tag | head -2 | tail -1
     fi
 
     echo - external/ant-wireless synchen
     cd $RootPfad/android/packages/android_external_ant-wireless
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git pull    
+    git tag | head -2 | tail -1
+    git pull
+    git tag | head -2 | tail -1
 
     echo - vendor/bq/$target synchen
     cd $RootPfad/android/lineage14.1/vendor/bq/$target        
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git pull 
+    git tag | head -2 | tail -1
+    git pull
+    git tag | head -2 | tail -1
     
     echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/android/packages/modifizierte
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git pull
+    git tag | head -2 | tail -1
+    #git pull
+    git tag | head -2 | tail -1
     
     #zurueck in den Pfad
     cd $lstPath       
@@ -357,29 +368,38 @@ while : ; do
     if [ $target = gohan  ]
     then
         echo - Ant+   
-        cp $RootPfad/android/packages/modifizierte/airplane_defaults.xml ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
+        cp $RootPfad/android/packages/modifizierte/Ant+/airplane_defaults.xml ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml       
         
         echo - device/bq/$target kopieren
         rm -rf device/bq/gohan
         cp -r $RootPfad/android/packages/android_device_bq_gohan/ ./device/bq/gohan/
-        rm -rf device/bq/gohan/.git      
+        rm -rf device/bq/gohan/.git
         
         echo - kernel/bq/msm8976 kopieren
         rm -rf kernel/bq/msm8976
         cp -r $RootPfad/android/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
-        rm -rf kernel/bq/msm8976/.git     
+        rm -rf kernel/bq/msm8976/.git
+        
+        echo - Signature Spoofing
+        
+        cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res/AndroidManifest.xml ./frameworks/base/core/res/AndroidManifest.xml 
+        cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res_res_values/cm_strings.xml ./frameworks/base/core/res/res/values/cm_strings.xml
+        cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res_res_values-de/cm_strings.xml ./frameworks/base/core/res/res/values-de/cm_strings.xml
+        cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_services_core_java_com_android_server/ServiceWatcher.java ./frameworks/base/services/core/java/com/android/server/ServiceWatcher.java  
+        cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_services_core_java_com_android_server_pm/PackageManagerService.java ./frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java  
+        
     fi    
     
     if [ $target = tenshi  ]
     then  
         echo  - gps.conf im Ordner austauschen
-        cp $RootPfad/android/packages/modifizierte/gps.conf ./device/bq/msm8937-common/gps/etc/gps.conf
-        cp $RootPfad/android/packages/modifizierte/msm8937.dtsi ./device/bq/msm8937-common/msm8937.dtsi    
+        cp $RootPfad/android/packages/modifizierte/Gps/gps.conf ./device/bq/msm8937-common/gps/etc/gps.conf
+        cp $RootPfad/android/packages/modifizierte/Tenshi/msm8937.dtsi ./device/bq/msm8937-common/msm8937.dtsi    
     fi
        
     echo - BqKamera Hack
     rm -rf frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
-    cp $RootPfad/android/packages/modifizierte/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+    cp $RootPfad/android/packages/modifizierte/CameraHack/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
         
     echo - external/ant-wireless kopieren
     rm -rf external/ant-wireless
@@ -387,8 +407,8 @@ while : ; do
     rm -rf external/ant-wireless/.git
 
     echo - die Lautstaerke Aenderungen und die VPN Uebersetzungen
-    cp $RootPfad/android/packages/modifizierte/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml    
-    cp $RootPfad/android/packages/modifizierte/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
+    cp $RootPfad/android/packages/modifizierte/Translations/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml    
+    cp $RootPfad/android/packages/modifizierte/Loudness/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
     
     echo "+++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++++++++++++"
     echo
