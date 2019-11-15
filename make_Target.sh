@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Version 1.0.0
+
 ##########################################################################################################
 #
 ##########################################################################################################
@@ -319,26 +321,32 @@ while : ; do
         cd $RootPfad/android/packages/android_device_bq_$target
         git config --get remote.origin.url
         git branch | grep \* | cut -d ' ' -f2
-        git tag | head -2 | tail -1
+        LOCAL=$(grep -Eoi "^Version.*" ./README.mkdn | sed  s@'Version '@''@)
+        echo Version: $LOCAL
         git pull
-        git tag | head -2 | tail -1
+        LOCAL=$(grep -Eoi "^Version.*" ./README.mkdn | sed  s@'Version '@''@)
+        echo Version: $LOCAL
         
         echo - kernel/bq/msm8976 synchen
         cd $RootPfad/android/packages/android_kernel_bq_msm8976
         git config --get remote.origin.url
-        git branch | grep \* | cut -d ' ' -f2
-        git tag | head -2 | tail -1
+        git branch | grep \* | cut -d ' ' -
+        LOCAL=$(grep -Eoi "EXTRAVERSION .*" ./Makefile | sed  s@'EXTRAVERSION ='@''@)
+        echo Version: 3.10.108$LOCAL
         git pull
-        git tag | head -2 | tail -1
+        LOCAL=$(grep -Eoi "EXTRAVERSION .*" ./Makefile | sed  s@'EXTRAVERSION ='@''@)
+        echo Version: 3.10.108$LOCAL
     fi
 
     echo - external/ant-wireless synchen
     cd $RootPfad/android/packages/android_external_ant-wireless
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git tag | head -2 | tail -1
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
     git pull
-    git tag | head -2 | tail -1
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
 
     echo - vendor/bq/$target synchen
     cd $RootPfad/android/lineage14.1/vendor/bq/$target        
@@ -352,9 +360,11 @@ while : ; do
     cd $RootPfad/android/packages/modifizierte
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git tag | head -2 | tail -1
-    #git pull
-    git tag | head -2 | tail -1
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
+    git pull
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
     
     #zurueck in den Pfad
     cd $lstPath       
@@ -380,8 +390,7 @@ while : ; do
         cp -r $RootPfad/android/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
         rm -rf kernel/bq/msm8976/.git
         
-        echo - Signature Spoofing
-        
+        echo - Signature Spoofing        
         cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res/AndroidManifest.xml ./frameworks/base/core/res/AndroidManifest.xml 
         cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res_res_values/cm_strings.xml ./frameworks/base/core/res/res/values/cm_strings.xml
         cp $RootPfad/android/packages/modifizierte/microG/frameworks_base_core_res_res_values-de/cm_strings.xml ./frameworks/base/core/res/res/values-de/cm_strings.xml
