@@ -1,5 +1,5 @@
 # android_addon_scripts
-Version 1.1.2
+Version 1.1.3
 
 modifizierte Dateien im LOS 14.1
 
@@ -20,3 +20,5 @@ Folder Tenshi
 
 Folder Translations
 in lineage14.1/packages/apps/Settings/res/values-de/cm_strings.xml
+
+Folder ims
