@@ -318,7 +318,7 @@
     <string name="data_usage_app_restrict_all_data_title">Alle Mobilfunkdatenzugriffe deaktivieren</string>
     <string name="data_usage_app_restrict_all_data_summary">Jegliche Mobilfunkdatenzugriffe verhindern</string>
     <string name="data_usage_app_restrict_all_wifi_title">Alle WLAN-Datenzugriffe deaktivieren</string>
-    <string name="data_usage_app_restrict_all_wifi_summary">Jegliche WLAN-Datenzugriffe verhindern</string>    
+    <string name="data_usage_app_restrict_all_wifi_summary">Jegliche WLAN-Datenzugriffe verhindern</string>
     <string name="data_usage_app_restrict_all_vpn_title">Alle VPN Datenzugriffe deaktivieren</string>
     <string name="data_usage_app_restrict_all_vpn_summary">Jegliche Datenzugriffe über VPN verhindern</string>        
     <string name="volume_link_notification_title">Gleiche Lautstärke für Klingelton und Benachrichtigungen</string>

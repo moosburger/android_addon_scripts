@@ -1,0 +1,1240 @@
+diff --git a/Android.mk b/Android.mk
+index edfc56f..bc4d601 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -539,6 +539,7 @@ aidl_files := \
+ 	frameworks/base/telephony/java/android/telephony/IccOpenLogicalChannelResponse.aidl \
+ 	frameworks/base/telephony/java/android/telephony/NeighboringCellInfo.aidl \
+ 	frameworks/base/telephony/java/android/telephony/ModemActivityInfo.aidl \
++	frameworks/base/telephony/java/android/telephony/ImsFeatureCapability.aidl \
+ 	frameworks/base/location/java/android/location/Location.aidl \
+ 	frameworks/base/location/java/android/location/Address.aidl \
+ 	frameworks/base/location/java/android/location/Criteria.aidl \
+diff --git a/packages/SystemUI/res/drawable/stat_sys_volte.xml b/packages/SystemUI/res/drawable/stat_sys_volte.xml
+new file mode 100644
+index 0000000..81cc5aa
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/stat_sys_volte.xml
+@@ -0,0 +1,27 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++    Copyright (C) 2016 The Android Open Source Project
++
++    Licensed under the Apache License, Version 2.0 (the "License");
++    you may not use this file except in compliance with the License.
++    You may obtain a copy of the License at
++
++         http://www.apache.org/licenses/LICENSE-2.0
++
++    Unless required by applicable law or agreed to in writing, software
++    distributed under the License is distributed on an "AS IS" BASIS,
++    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++    See the License for the specific language governing permissions and
++    limitations under the License.
++-->
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:autoMirrored="false"
++        android:width="34dp"
++        android:height="18dp"
++        android:viewportWidth="34.0"
++        android:viewportHeight="18.0">
++    <path
++        android:name="outline"
++        android:fillColor="#FFFFFFFF"
++        android:pathData="M27.000,15.333 L27.000,14.333 L31.667,14.333 L31.667,11.667 L32.667,11.667 L32.667,15.333 L27.000,15.333 zM28.000,12.667 L27.000,12.667 L27.000,7.667 L28.000,7.667 L28.000,9.667 L32.667,9.667 L32.667,10.667 L28.000,10.667 L28.000,12.667 zM27.000,2.667 L28.000,2.667 L28.000,6.000 L29.333,6.000 L29.333,3.333 L30.333,3.333 L30.333,6.000 L31.667,6.000 L31.667,2.667 L32.667,2.667 L32.667,7.000 L27.000,7.000 L27.000,2.667 zM24.810,12.336 C24.338,12.336 23.956,11.966 23.956,11.510 C23.956,7.543 20.620,4.316 16.520,4.316 C16.048,4.316 15.666,3.946 15.666,3.490 C15.666,3.033 16.048,2.663 16.520,2.663 C21.562,2.663 25.664,6.632 25.664,11.510 C25.664,11.966 25.281,12.336 24.810,12.336 zM15.932,5.664 C19.462,5.664 22.335,8.400 22.335,11.763 C22.335,12.078 22.067,12.333 21.737,12.333 C21.407,12.333 21.139,12.078 21.139,11.763 C21.139,9.028 18.803,6.803 15.932,6.803 C15.601,6.803 15.334,6.549 15.334,6.234 C15.334,5.919 15.601,5.664 15.932,5.664 zM19.667,11.810 C19.667,11.810 19.667,11.835 19.667,11.835 C19.667,13.768 18.171,15.337 16.156,15.337 C14.153,15.337 12.669,13.793 12.669,11.860 C12.669,11.860 12.669,11.835 12.669,11.835 C12.669,9.903 14.165,8.334 16.180,8.334 C18.183,8.334 19.667,9.877 19.667,11.810 zM14.666,11.811 C14.666,11.811 14.666,11.832 14.666,11.832 C14.666,12.631 15.276,13.330 16.175,13.330 C17.107,13.330 17.663,12.651 17.663,11.852 C17.663,11.852 17.663,11.832 17.663,11.832 C17.663,11.032 17.053,10.333 16.154,10.333 C15.223,10.333 14.666,11.012 14.666,11.811 zM6.667,15.333 L1.667,2.667 L4.667,2.667 L7.792,11.424 L11.000,2.667 L14.000,2.667 L8.667,15.333 L6.667,15.333 z"/>
++</vector>
+diff --git a/packages/SystemUI/res/layout/mobile_signal_group.xml b/packages/SystemUI/res/layout/mobile_signal_group.xml
+index 8b10074..c3681d4 100644
+--- a/packages/SystemUI/res/layout/mobile_signal_group.xml
++++ b/packages/SystemUI/res/layout/mobile_signal_group.xml
+@@ -16,32 +16,20 @@
+ ** limitations under the License.
+ */
+ -->
+-<FrameLayout
++<LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:systemui="http://schemas.android.com/apk/res-auto"
+-    android:id="@+id/mobile_combo"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
++    android:orientation="horizontal"
+     >
+-    <com.android.systemui.statusbar.AnimatedImageView
+-        android:theme="@style/DualToneLightTheme"
+-        android:id="@+id/mobile_signal"
+-        android:layout_height="wrap_content"
+-        android:layout_width="wrap_content"
+-        systemui:hasOverlappingRendering="false"
+-        />
+-    <com.android.systemui.statusbar.AnimatedImageView
+-        android:theme="@style/DualToneDarkTheme"
+-        android:id="@+id/mobile_signal_dark"
+-        android:layout_height="wrap_content"
+-        android:layout_width="wrap_content"
+-        android:alpha="0.0"
+-        systemui:hasOverlappingRendering="false"
+-        />
+     <ImageView
+-        android:id="@+id/mobile_type"
++        android:id="@+id/volte"
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
++        android:src="@drawable/stat_sys_volte"
++        android:visibility="gone"
++        android:layout_marginEnd="@dimen/status_bar_volte_margin_end"
+         />
+     <ImageView
+         android:id="@+id/mobile_roaming"
+@@ -54,4 +42,32 @@
+         android:src="@drawable/stat_sys_roaming"
+         android:contentDescription="@string/accessibility_data_connection_roaming"
+         android:visibility="gone" />
+-</FrameLayout>
++    <FrameLayout
++        xmlns:android="http://schemas.android.com/apk/res/android"
++        xmlns:systemui="http://schemas.android.com/apk/res-auto"
++        android:id="@+id/mobile_combo"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        >
++        <com.android.systemui.statusbar.AnimatedImageView
++            android:theme="@style/DualToneLightTheme"
++            android:id="@+id/mobile_signal"
++            android:layout_height="wrap_content"
++            android:layout_width="wrap_content"
++            systemui:hasOverlappingRendering="false"
++            />
++        <com.android.systemui.statusbar.AnimatedImageView
++            android:theme="@style/DualToneDarkTheme"
++            android:id="@+id/mobile_signal_dark"
++            android:layout_height="wrap_content"
++            android:layout_width="wrap_content"
++            android:alpha="0.0"
++            systemui:hasOverlappingRendering="false"
++            />
++        <ImageView
++            android:id="@+id/mobile_type"
++            android:layout_height="wrap_content"
++            android:layout_width="wrap_content"
++            />
++    </FrameLayout>
++</LinearLayout>
+diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
+index 7bd4b1c..212af89 100644
+--- a/packages/SystemUI/res/values/config.xml
++++ b/packages/SystemUI/res/values/config.xml
+@@ -41,6 +41,9 @@
+     data icon on devices -->
+     <bool name="config_hspa_data_distinguishable">false</bool>
+ 
++    <!-- Control whether to show VoLTE icon in statusbar when ims is registered.-->
++    <bool name="config_showVolteIcon">false</bool>
++
+     <!-- Component to be used as the status bar service.  Must implement the IStatusBar
+      interface.  This name is in the ComponentName flattened format (package/class)  -->
+     <string name="config_statusBarComponent" translatable="false">com.android.systemui.statusbar.phone.PhoneStatusBar</string>
+diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
+index 38af096..25eb5cc 100644
+--- a/packages/SystemUI/res/values/dimens.xml
++++ b/packages/SystemUI/res/values/dimens.xml
+@@ -680,4 +680,7 @@
+ 
+     <!-- The alpha to apply to the recents row when it doesn't have focus -->
+     <item name="recents_recents_row_dim_alpha" format="float" type="dimen">0.5</item>
++
++    <!-- The fixed end margin of volte end margin -->
++    <dimen name="status_bar_volte_margin_end">4dp</dimen>
+ </resources>
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/SignalClusterView.java b/packages/SystemUI/src/com/android/systemui/statusbar/SignalClusterView.java
+index 72bcda4..7e08117 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/SignalClusterView.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/SignalClusterView.java
+@@ -277,6 +277,7 @@ public class SignalClusterView
+             return;
+         }
+         state.mMobileVisible = statusIcon.visible && !mBlockMobile;
++        state.mMobileVolteVisible = statusIcon.volteAvailable;
+         state.mMobileStrengthId = statusIcon.icon;
+         state.mMobileTypeId = statusType;
+         state.mMobileDescription = statusIcon.contentDescription;
+@@ -581,6 +582,7 @@ public class SignalClusterView
+     private class PhoneState {
+         private final int mSubId;
+         private boolean mMobileVisible = false;
++        private boolean mMobileVolteVisible = false;
+         private int mMobileStrengthId = 0, mMobileTypeId = 0;
+         private int mLastMobileStrengthId = -1;
+         private int mLastMobileTypeId = -1;
+@@ -588,7 +590,7 @@ public class SignalClusterView
+         private String mMobileDescription, mMobileTypeDescription;
+ 
+         private ViewGroup mMobileGroup;
+-        private ImageView mMobile, mMobileDark, mMobileType, mMobileRoaming;
++        private ImageView mMobileVolte, mMobile, mMobileDark, mMobileType, mMobileRoaming;
+         public boolean mRoaming;
+ 
+         public PhoneState(int subId, Context context) {
+@@ -600,6 +602,7 @@ public class SignalClusterView
+ 
+         public void setViews(ViewGroup root) {
+             mMobileGroup    = root;
++            mMobileVolte    = (ImageView) root.findViewById(R.id.volte);
+             mMobile         = (ImageView) root.findViewById(R.id.mobile_signal);
+             mMobileDark     = (ImageView) root.findViewById(R.id.mobile_signal_dark);
+             mMobileType     = (ImageView) root.findViewById(R.id.mobile_type);
+@@ -607,6 +610,8 @@ public class SignalClusterView
+         }
+ 
+         public boolean apply(boolean isSecondaryIcon) {
++            mMobileVolte.setVisibility(mMobileVolteVisible ? View.VISIBLE : View.GONE);
++            
+             if (mMobileVisible && !mIsAirplaneMode) {
+                 if (mLastMobileStrengthId != mMobileStrengthId) {
+                     updateAnimatableIcon(mMobile, mMobileStrengthId);
+@@ -699,8 +704,8 @@ public class SignalClusterView
+                     StatusBarIconController.getDarkIntensity(tintArea, mMobile, darkIntensity),
+                     mMobile, mMobileDark);
+             setTint(mMobileType, StatusBarIconController.getTint(tintArea, mMobileType, tint));
+-            setTint(mMobileRoaming, StatusBarIconController.getTint(tintArea, mMobileRoaming,
+-                    tint));
++            setTint(mMobileVolte, StatusBarIconController.getTint(tintArea, mMobileVolte, tint));
++            setTint(mMobileRoaming, StatusBarIconController.getTint(tintArea, mMobileRoaming, tint));
+         }
+     }
+ }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/MobileSignalController.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/MobileSignalController.java
+index 866c5ae..b7a1f81 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/MobileSignalController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/MobileSignalController.java
+@@ -20,6 +20,7 @@ import android.content.Intent;
+ import android.content.res.Resources;
+ import android.net.NetworkCapabilities;
+ import android.os.Looper;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.PhoneStateListener;
+ import android.telephony.ServiceState;
+ import android.telephony.SignalStrength;
+@@ -67,6 +68,8 @@ public class MobileSignalController extends SignalController<
+     private SignalStrength mSignalStrength;
+     private MobileIconGroup mDefaultIcons;
+     private Config mConfig;
++    private boolean mImsRegistered = false;
++    private boolean mVolteEnabled = false;
+ 
+     // TODO: Reduce number of vars passed in, if we have the NetworkController, probably don't
+     // need listener lists anymore.
+@@ -144,7 +147,11 @@ public class MobileSignalController extends SignalController<
+                         | PhoneStateListener.LISTEN_CALL_STATE
+                         | PhoneStateListener.LISTEN_DATA_CONNECTION_STATE
+                         | PhoneStateListener.LISTEN_DATA_ACTIVITY
+-                        | PhoneStateListener.LISTEN_CARRIER_NETWORK_CHANGE);
++                        | PhoneStateListener.LISTEN_CARRIER_NETWORK_CHANGE
++                        | (mConfig.showVolteIcon
++                                ? PhoneStateListener.LISTEN_IMS_REGISTERED_STATE_CHANGE
++                                        | PhoneStateListener.LISTEN_IMS_FEATURE_CAPABILITY_CHANGE
++                                : PhoneStateListener.LISTEN_NONE));
+     }
+ 
+     /**
+@@ -234,6 +241,7 @@ public class MobileSignalController extends SignalController<
+         // Show icon in QS when we are connected or data is disabled.
+         boolean showDataIcon = mCurrentState.dataConnected || dataDisabled;
+         IconState statusIcon = new IconState(mCurrentState.enabled && !mCurrentState.airplaneMode,
++                mCurrentState.volteAvailable,
+                 getCurrentIconId(), contentDescription);
+ 
+         int qsTypeIcon = 0;
+@@ -428,6 +436,9 @@ public class MobileSignalController extends SignalController<
+                 && !TextUtils.isEmpty(mServiceState.getOperatorAlphaShort())) {
+             mCurrentState.networkName = mServiceState.getOperatorAlphaShort();
+         }
++        if (mConfig.showVolteIcon) {
++            mCurrentState.volteAvailable = mImsRegistered && mVolteEnabled;
++        }
+ 
+         notifyListenersIfNecessary();
+     }
+@@ -453,6 +464,8 @@ public class MobileSignalController extends SignalController<
+         pw.println("  mSignalStrength=" + mSignalStrength + ",");
+         pw.println("  mDataState=" + mDataState + ",");
+         pw.println("  mDataNetType=" + mDataNetType + ",");
++        pw.println("  mImsRegistered=" + mImsRegistered + ",");
++        pw.println("  mVolteEnabled=" + mVolteEnabled + ",");
+     }
+ 
+     class MobilePhoneStateListener extends PhoneStateListener {
+@@ -517,6 +530,25 @@ public class MobileSignalController extends SignalController<
+ 
+             updateTelephony();
+         }
++
++        @Override
++        public void onImsRegisteredChanged(boolean imsRegistered) {
++            if (DEBUG) {
++                Log.d(mTag, "onImsRegisteredChanged: imsRegistered=" + imsRegistered);
++            }
++            mImsRegistered = imsRegistered;
++            updateTelephony();
++        }
++
++        @Override
++        public void onImsFeatureCapabilityChanged(ImsFeatureCapability imsFeatureCapability) {
++            if (DEBUG) {
++                Log.d(mTag, "onImsFeatureCapabilityChanged: imsFeatureCapability="
++                        + imsFeatureCapability);
++            }
++            mVolteEnabled = imsFeatureCapability.isVolteEnabled();
++            updateTelephony();
++        }
+     };
+ 
+     static class MobileIconGroup extends SignalController.IconGroup {
+@@ -548,6 +580,7 @@ public class MobileSignalController extends SignalController<
+         boolean carrierNetworkChangeMode;
+         boolean isDefault;
+         boolean userSetup;
++        boolean volteAvailable;
+         boolean roaming;
+ 
+         @Override
+@@ -563,6 +596,7 @@ public class MobileSignalController extends SignalController<
+             airplaneMode = state.airplaneMode;
+             carrierNetworkChangeMode = state.carrierNetworkChangeMode;
+             userSetup = state.userSetup;
++            volteAvailable = state.volteAvailable;
+             roaming = state.roaming;
+         }
+ 
+@@ -579,8 +613,9 @@ public class MobileSignalController extends SignalController<
+             builder.append("isEmergency=").append(isEmergency).append(',');
+             builder.append("airplaneMode=").append(airplaneMode).append(',');
+             builder.append("carrierNetworkChangeMode=").append(carrierNetworkChangeMode)
+-                    .append(',');
+-            builder.append("userSetup=").append(userSetup);
++                    .append(',');           
++            builder.append("userSetup=").append(userSetup).append(',');
++            builder.append("volteAvailable=").append(volteAvailable);
+         }
+ 
+         @Override
+@@ -595,6 +630,7 @@ public class MobileSignalController extends SignalController<
+                     && ((MobileState) o).carrierNetworkChangeMode == carrierNetworkChangeMode
+                     && ((MobileState) o).userSetup == userSetup
+                     && ((MobileState) o).isDefault == isDefault
++                    && ((MobileState) o).volteAvailable == volteAvailable
+                     && ((MobileState) o).roaming == roaming;
+         }
+     }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkController.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkController.java
+index ad5f24b..9696e04 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkController.java
+@@ -63,18 +63,25 @@ public interface NetworkController {
+ 
+     public static class IconState {
+         public final boolean visible;
++        public final boolean volteAvailable;
+         public final int icon;
+         public final String contentDescription;
+ 
+-        public IconState(boolean visible, int icon, String contentDescription) {
++        public IconState(boolean visible, boolean volteAvailable, int icon,
++                String contentDescription) {
+             this.visible = visible;
++            this.volteAvailable = volteAvailable;
+             this.icon = icon;
+             this.contentDescription = contentDescription;
+         }
+ 
++        public IconState(boolean visible, int icon, String contentDescription) {
++            this(visible, false, icon, contentDescription);
++        }
++
+         public IconState(boolean visible, int icon, int contentDescription,
+                 Context context) {
+-            this(visible, icon, context.getString(contentDescription));
++            this(visible, false, icon, context.getString(contentDescription));
+         }
+     }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkControllerImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkControllerImpl.java
+index d68bbb9..a10863c 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkControllerImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkControllerImpl.java
+@@ -804,6 +804,10 @@ public class NetworkControllerImpl extends BroadcastReceiver
+                 if (activity != null) {
+                     controller.setActivity(Integer.parseInt(activity));
+                 }
++                String volte = args.getString("volte");
++                if (volte != null) {
++                    controller.getState().volteAvailable = volte.equals("show");
++                }
+                 controller.getState().enabled = show;
+                 controller.notifyListeners();
+             }
+@@ -869,6 +873,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
+         boolean show4gForLte = false;
+         boolean hideLtePlus = false;
+         boolean hspaDataDistinguishable;
++        boolean showVolteIcon = false;
+ 
+         static Config readConfig(Context context) {
+             Config config = new Config();
+@@ -881,6 +886,8 @@ public class NetworkControllerImpl extends BroadcastReceiver
+             config.hspaDataDistinguishable =
+                     res.getBoolean(R.bool.config_hspa_data_distinguishable);
+             config.hideLtePlus = res.getBoolean(R.bool.config_hideLtePlus);
++            config.showVolteIcon =
++                    res.getBoolean(R.bool.config_showVolteIcon);
+             return config;
+         }
+     }
+diff --git a/services/core/java/com/android/server/TelephonyRegistry.java b/services/core/java/com/android/server/TelephonyRegistry.java
+index 35c32ca..8642b62 100644
+--- a/services/core/java/com/android/server/TelephonyRegistry.java
++++ b/services/core/java/com/android/server/TelephonyRegistry.java
+@@ -34,6 +34,7 @@ import android.os.Message;
+ import android.os.RemoteException;
+ import android.os.UserHandle;
+ import android.telephony.CellLocation;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.Rlog;
+ import android.telephony.TelephonyManager;
+ import android.telephony.SubscriptionManager;
+@@ -174,6 +175,10 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+ 
+     private VoLteServiceState mVoLteServiceState = new VoLteServiceState();
+ 
++    private boolean[] mImsRegisteredStates;
++
++    private ImsFeatureCapability[] mImsFeatureCapabilities;
++
+     private int mDefaultSubId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
+ 
+     private int mDefaultPhoneId = SubscriptionManager.INVALID_PHONE_INDEX;
+@@ -311,6 +316,8 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+         mDataConnectionLinkProperties = new LinkProperties[numPhones];
+         mDataConnectionNetworkCapabilities = new NetworkCapabilities[numPhones];
+         mCellInfo = new ArrayList<List<CellInfo>>();
++        mImsRegisteredStates = new boolean[numPhones];
++        mImsFeatureCapabilities = new ImsFeatureCapability[numPhones];
+         for (int i = 0; i < numPhones; i++) {
+             mConnectedApns[i] = new ArrayList<String>();
+             mCallState[i] =  TelephonyManager.CALL_STATE_IDLE;
+@@ -326,6 +333,8 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+             mDataConnectionApn[i] =  "";
+             mCellLocation[i] = new Bundle();
+             mCellInfo.add(i, null);
++            mImsRegisteredStates[i] = false;
++            mImsFeatureCapabilities[i] = new ImsFeatureCapability();
+         }
+ 
+         // Note that location can be null for non-phone builds like
+@@ -644,6 +653,25 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+                             remove(r.binder);
+                         }
+                     }
++                    if ((events & PhoneStateListener.LISTEN_IMS_REGISTERED_STATE_CHANGE) != 0) {
++                        try {
++                            if (VDBG) log("listen: ims registered state="
++                                    + mImsRegisteredStates[phoneId]);
++                            r.callback.onImsRegisteredChanged(mImsRegisteredStates[phoneId]);
++                        } catch (RemoteException ex) {
++                            remove(r.binder);
++                        }
++                    }
++                    if ((events & PhoneStateListener.LISTEN_IMS_FEATURE_CAPABILITY_CHANGE) != 0) {
++                        try {
++                            if (VDBG) log("listen: ims featrues capability="
++                                    + mImsFeatureCapabilities[phoneId]);
++                            r.callback.onImsFeatureCapabilityChanged(
++                                    new ImsFeatureCapability(mImsFeatureCapabilities[phoneId]));
++                        } catch (RemoteException ex) {
++                            remove(r.binder);
++                        }
++                    }
+                 }
+             }
+         } else {
+@@ -877,6 +905,93 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+         }
+     }
+ 
++    public void notifyImsRegisteredChangedForSubscriber(int subId, boolean isImsRegistered) {
++        if (!checkNotifyPermission("notifyImsRegisteredChangedForSubscriber()")) {
++            return;
++        }
++        if (VDBG) {
++            log("notifyImsRegisteredChangedForSubscriber: subId=" + subId
++                + " isImsRegistered=" + isImsRegistered);
++        }
++        synchronized (mRecords) {
++            int phoneId = SubscriptionManager.getPhoneId(subId);
++            if (validatePhoneId(phoneId)) {
++                if (VDBG) log("notifyImsRegisteredChangedForSubscriber: valid phoneId=" + phoneId);
++                mImsRegisteredStates[phoneId] = isImsRegistered;
++                for (Record r : mRecords) {
++                    if (VDBG) {
++                        log("notifyImsRegisteredChangedForSubscriber: r=" + r + " subId=" + subId
++                                + " phoneId=" + phoneId + " imsRegistered=" + isImsRegistered);
++                    }
++                    if (r.matchPhoneStateListenerEvent(
++                                PhoneStateListener.LISTEN_IMS_REGISTERED_STATE_CHANGE) &&
++                            idMatch(r.subId, subId, phoneId)) {
++                        try {
++                            if (DBG) {
++                                log("notifyImsRegisteredChangedForSubscriber: "
++                                        + "callback.onImsRegisteredChanged r=" + r
++                                        + " subId=" + subId + " phoneId=" + phoneId
++                                        + " isImsRegistered=" + isImsRegistered);
++                            }
++                            r.callback.onImsRegisteredChanged(isImsRegistered);
++                        } catch (RemoteException ex) {
++                            mRemoveList.add(r.binder);
++                        }
++                    }
++                }
++            } else {
++                log("notifyImsRegisteredChangedForSubscriber: invalid phoneId=" + phoneId);
++            }
++            handleRemoveListLocked();
++        }
++    }
++
++    public void notifyImsFeatureCapabilityChangedForSubscriber(int subId,
++            ImsFeatureCapability imsFeatureCapability) {
++        if (!checkNotifyPermission("notifyImsFeatureCapabilityChangedForSubscriber()")) {
++            return;
++        }
++        if (VDBG) {
++            log("notifyImsFeatureCapabilityChangedForSubscriber: subId=" + subId
++                + " imsFeatureCapability=" + imsFeatureCapability);
++        }
++        synchronized (mRecords) {
++            int phoneId = SubscriptionManager.getPhoneId(subId);
++            if (validatePhoneId(phoneId)) {
++                if (VDBG) log("notifyImsFeatureCapabilityChangedForSubscriber: valid phoneId="
++                        + phoneId);
++                mImsFeatureCapabilities[phoneId] = imsFeatureCapability;
++                for (Record r : mRecords) {
++                    if (VDBG) {
++                        log("notifyImsFeatureCapabilityChangedForSubscriber: r=" + r
++                                + " subId=" + subId
++                                + " phoneId=" + phoneId
++                                + " imsFeatureCapability=" + imsFeatureCapability);
++                    }
++                    if (r.matchPhoneStateListenerEvent(
++                                PhoneStateListener.LISTEN_IMS_FEATURE_CAPABILITY_CHANGE) &&
++                            idMatch(r.subId, subId, phoneId)) {
++                        try {
++                            if (DBG) {
++                                log("notifyImsFeatureCapabilityChangedForSubscriber:"
++                                        + " callback.onImsFeatureCapabilityChanged r=" + r
++                                        + " subId=" + subId + " phoneId=" + phoneId
++                                        + " imsFeatureCapability=" + imsFeatureCapability);
++                            }
++                            r.callback.onImsFeatureCapabilityChanged(
++                                    new ImsFeatureCapability(imsFeatureCapability));
++                        } catch (RemoteException ex) {
++                            mRemoveList.add(r.binder);
++                        }
++                    }
++                }
++            } else {
++                log("notifyImsFeatureCapabilityChangedForSubscriber: invalid phoneId=" + phoneId);
++            }
++            handleRemoveListLocked();
++        }
++    }
++
+     public void notifyCellInfo(List<CellInfo> cellInfo) {
+          notifyCellInfoForSubscriber(SubscriptionManager.DEFAULT_SUBSCRIPTION_ID, cellInfo);
+     }
+@@ -1340,6 +1455,8 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+                         mDataConnectionNetworkCapabilities[i]);
+                 pw.println("  mCellLocation=" + mCellLocation[i]);
+                 pw.println("  mCellInfo=" + mCellInfo.get(i));
++                pw.println("  mImsRegisteredState=" + mImsRegisteredStates[i]);
++                pw.println("  mImsFeatureCapability=" + mImsFeatureCapabilities[i]);
+             }
+             pw.println("registrations: count=" + recordCount);
+             for (Record r : mRecords) {
+@@ -1802,5 +1919,26 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
+                 mRemoveList.add(r.binder);
+             }
+         }
++
++        if ((events & PhoneStateListener.LISTEN_IMS_REGISTERED_STATE_CHANGE) != 0) {
++            try {
++                if (VDBG) log("checkPossibleMissNotify: onImsRegisteredChanged state=" +
++                        mImsRegisteredStates[phoneId]);
++                r.callback.onImsRegisteredChanged(mImsRegisteredStates[phoneId]);
++            } catch (RemoteException ex) {
++                mRemoveList.add(r.binder);
++            }
++        }
++
++        if ((events & PhoneStateListener.LISTEN_IMS_FEATURE_CAPABILITY_CHANGE) != 0) {
++            try {
++                if (VDBG) log("checkPossibleMissNotify: onImsFeatureCapabilityChanged capability="
++                        + mImsFeatureCapabilities[phoneId]);
++                r.callback.onImsFeatureCapabilityChanged(
++                        new ImsFeatureCapability(mImsFeatureCapabilities[phoneId]));
++            } catch (RemoteException ex) {
++                mRemoveList.add(r.binder);
++            }
++        }
+     }
+ }
+diff --git a/telephony/java/android/telephony/ImsFeatureCapability.aidl b/telephony/java/android/telephony/ImsFeatureCapability.aidl
+new file mode 100644
+index 0000000..6f7c238
+--- /dev/null
++++ b/telephony/java/android/telephony/ImsFeatureCapability.aidl
+@@ -0,0 +1,21 @@
++/*
++**
++** Copyright 2016, The Android Open Source Project
++**
++** Licensed under the Apache License, Version 2.0 (the "License");
++** you may not use this file except in compliance with the License.
++** You may obtain a copy of the License at
++**
++**     http://www.apache.org/licenses/LICENSE-2.0
++**
++** Unless required by applicable law or agreed to in writing, software
++** distributed under the License is distributed on an "AS IS" BASIS,
++** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++** See the License for the specific language governing permissions and
++** limitations under the License.
++*/
++
++package android.telephony;
++
++parcelable ImsFeatureCapability;
++
+diff --git a/telephony/java/android/telephony/ImsFeatureCapability.java b/telephony/java/android/telephony/ImsFeatureCapability.java
+new file mode 100644
+index 0000000..4390c7b
+--- /dev/null
++++ b/telephony/java/android/telephony/ImsFeatureCapability.java
+@@ -0,0 +1,483 @@
++/*
++ * Copyright (C) 2016 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package android.telephony;
++
++import android.os.Bundle;
++import android.os.Parcel;
++import android.os.Parcelable;
++import android.telephony.Rlog;
++import android.util.SparseIntArray;
++
++/**
++ * Contains IMS feature capability related information.
++ *
++ * The following IMS feature capability information is included in returned ImsFeatureCapability:
++ *
++ * <ul>
++ *   <li>IMS VoLTE enabled state
++ *   <li>IMS ViLTE enabled state
++ *   <li>IMS VoWiFi enabled state
++ *   <li>IMS ViWiFi enabled state
++ *   <li>IMS UtLTE enabled state
++ *   <li>IMS UtWiFi enabled state
++ * </ul>
++ *
++ * @see com.android.ims.ImsConnectionStateListener#onFeatureCapabilityChanged(int, int[], int[])
++ * @see com.android.internal.telephony.imsphone.ImsPhoneCallTracker#mImsConnectionStateListener
++ *
++ * @hide
++ */
++public class ImsFeatureCapability implements Parcelable {
++
++    public static final int FEATURE_TYPE_UNKNOWN = -1;
++
++    /**
++     * FEATURE_TYPE_VOLTE supports features defined in 3GPP and
++     * GSMA IR.92 over LTE.
++     */
++    public static final int FEATURE_TYPE_VOICE_OVER_LTE = 0;
++
++    /**
++     * FEATURE_TYPE_LVC supports features defined in 3GPP and
++     * GSMA IR.94 over LTE.
++     */
++    public static final int FEATURE_TYPE_VIDEO_OVER_LTE = 1;
++
++    /**
++     * FEATURE_TYPE_VOICE_OVER_WIFI supports features defined in 3GPP and
++     * GSMA IR.92 over WiFi.
++     */
++    public static final int FEATURE_TYPE_VOICE_OVER_WIFI = 2;
++
++    /**
++     * FEATURE_TYPE_VIDEO_OVER_WIFI supports features defined in 3GPP and
++     * GSMA IR.94 over WiFi.
++     */
++    public static final int FEATURE_TYPE_VIDEO_OVER_WIFI = 3;
++
++    /**
++     * FEATURE_TYPE_UT supports features defined in 3GPP and
++     * GSMA IR.92 over LTE.
++     */
++    public static final int FEATURE_TYPE_UT_OVER_LTE = 4;
++
++    /**
++     * FEATURE_TYPE_UT_OVER_WIFI supports features defined in 3GPP and
++     * GSMA IR.92 over WiFi.
++     */
++    public static final int FEATURE_TYPE_UT_OVER_WIFI = 5;
++
++    public static final int FEATURE_TYPE_LENGTH = FEATURE_TYPE_UT_OVER_WIFI + 1;
++
++    /**
++     * Indicates whether IMS feature VoLTE is enabled
++     */
++    public static final int CAPABILITY_VOLTE = 0x00000001;
++
++    /**
++     * Indicates whether IMS feature ViLTE is enabled
++     */
++    public static final int CAPABILITY_VILTE = 0x00000002;
++
++    /**
++     * Indicates whether IMS feature VoWiFi is enabled
++     */
++    public static final int CAPABILITY_VOWIFI = 0x00000004;
++
++    /**
++     * Indicates whether IMS feature ViWiFi is enabled
++     */
++    public static final int CAPABILITY_VIWIFI = 0x00000008;
++
++    /**
++     * Indicates whether IMS feature UtLTE is enabled
++     */
++    public static final int CAPABILITY_UTLTE = 0x00000010;
++
++    /**
++     * Indicates whether IMS feature UtWiFi is enabled
++     */
++    public static final int CAPABILITY_UTWIFI = 0x00000020;
++
++    /**
++     * The IMS feature type and IMS feature capability mapping
++     */
++    private static final SparseIntArray IMS_CAPABILITY_MAP = new SparseIntArray();
++    static {
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_VOICE_OVER_LTE, CAPABILITY_VOLTE);
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_VIDEO_OVER_LTE, CAPABILITY_VILTE);
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_VOICE_OVER_WIFI, CAPABILITY_VOWIFI);
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_VIDEO_OVER_WIFI, CAPABILITY_VIWIFI);
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_UT_OVER_LTE, CAPABILITY_UTLTE);
++        IMS_CAPABILITY_MAP.put(FEATURE_TYPE_UT_OVER_WIFI, CAPABILITY_UTWIFI);
++    }
++
++    /**
++     * Indicates current IMS feature capabilities
++     */
++    private int mImsFeatureCapabilities;
++
++    /**
++     * Empty constructor
++     */
++    public ImsFeatureCapability() {
++    }
++
++    /**
++     * Create a new ImsFeatureCapability from a IMS features settings arrary.
++     *
++     * This method is used by ImsPhoneCallTracker and maybe by
++     * external applications.
++     *
++     * @param imsFeatureEnabled IMS features settings arrary
++     * @return newly created ImsFeatureCapability
++     */
++    public static ImsFeatureCapability newFromBoolArrary(boolean[] imsFeatureEnabled) {
++        ImsFeatureCapability ret;
++        ret = new ImsFeatureCapability();
++        ret.setFromBoolArrary(imsFeatureEnabled);
++        return ret;
++    }
++
++    /**
++     * Create a new IMS features settings arrary from a ImsFeatureCapability.
++     *
++     * @param imsFeatureCapability The ImsFeatureCapability to be converted
++     * @return newly created IMS features settings arrary
++     */
++    public static boolean[] convertToBoolArrary(
++            ImsFeatureCapability imsFeatureCapability) {
++        boolean[] ret;
++        ret = new boolean[FEATURE_TYPE_LENGTH];
++        if (imsFeatureCapability != null) {
++            imsFeatureCapability.fillInBoolArrary(ret);
++        }
++        return ret;
++    }
++
++    /**
++     * Copy constructors
++     *
++     * @param i Source Ims feature capability
++     */
++    public ImsFeatureCapability(ImsFeatureCapability i) {
++        copyFrom(i);
++    }
++
++    /**
++     * Copy Ims feature capability
++     *
++     * @param i Source Ims feature capability
++     */
++    public void copyFrom(ImsFeatureCapability i) {
++        mImsFeatureCapabilities = i.mImsFeatureCapabilities;
++    }
++
++    /**
++     * Construct a ImsFeatureCapability object from the given parcel.
++     */
++    public ImsFeatureCapability(Parcel in) {
++        mImsFeatureCapabilities = in.readInt();
++    }
++
++    public void writeToParcel(Parcel out, int flags) {
++        out.writeInt(mImsFeatureCapabilities);
++    }
++
++    public int describeContents() {
++        return 0;
++    }
++
++    public static final Parcelable.Creator<ImsFeatureCapability> CREATOR =
++            new Parcelable.Creator<ImsFeatureCapability>() {
++        public ImsFeatureCapability createFromParcel(Parcel in) {
++            return new ImsFeatureCapability(in);
++        }
++
++        public ImsFeatureCapability[] newArray(int size) {
++            return new ImsFeatureCapability[size];
++        }
++    };
++
++    /**
++     * Sets the ImsFeatureCapability's capabilities as a bit mask of
++     * the {@code CAPABILITY_*} constants.
++     *
++     * @param imsFeatureCapabilities The new IMS feature capabilities.
++     */
++    public void setImsFeatureCapabilities(int imsFeatureCapabilities) {
++        this.mImsFeatureCapabilities = imsFeatureCapabilities;
++    }
++
++    /**
++     * Returns the ImsFeatureCapability's capabilities, as a bit mask of
++     * the {@code CAPABILITY_*} constants.
++     */
++    public int getImsFeatureCapabilities() {
++        return mImsFeatureCapabilities;
++    }
++
++    /**
++     * Whether the given capabilities support the specified capability.
++     *
++     * @param capabilities A capability bit field.
++     * @param capability The capability to check capabilities for.
++     * @return Whether the specified capability is supported.
++     */
++    public static boolean can(int capabilities, int capability) {
++        return (capabilities & capability) != 0;
++    }
++
++    /**
++     * Whether the capabilities of this {@code ImsFeatureCapability}
++     * supports the specified capability.
++     *
++     * @param capability The capability to check capabilities for.
++     * @return Whether the specified capability is supported.
++     */
++    public boolean can(int capability) {
++        return can(mImsFeatureCapabilities, capability);
++    }
++
++    /**
++     * Adds the specified capability to the set of capabilities of
++     * this {@code ImsFeatureCapability}.
++     *
++     * @param capability The capability to add to the set.
++     */
++    public void addCapability(int capability) {
++        mImsFeatureCapabilities |= capability;
++    }
++
++    /**
++     * Removes the specified capability from the set of capabilities of
++     * this {@code ImsFeatureCapability}.
++     *
++     * @param capability The capability to remove from the set.
++     */
++    public void removeCapability(int capability) {
++        mImsFeatureCapabilities &= ~capability;
++    }
++
++    /**
++     * Changes a capabilities bit-mask to add or remove a capability.
++     *
++     * @param capabilities The capabilities bit-mask.
++     * @param capability The capability to change.
++     * @param enabled Whether the capability should be set or removed.
++     * @return The capabilities bit-mask with the capability changed.
++     */
++    public static int changeCapability(int maskCapabilities, int capability, boolean enabled) {
++        if (enabled) {
++            return maskCapabilities | capability;
++        } else {
++            return maskCapabilities & ~capability;
++        }
++    }
++
++    /**
++     * Changes the specified capability from the set of capabilities of
++     * this {@code ImsFeatureCapability}.
++     *
++     * @param capability The capability to change.
++     * @param enabled Whether the capability should be set or removed.
++     * @return The set of changed capabilities of this {@code ImsFeatureCapability}.
++     */
++    public int changeCapability(int capability, boolean enabled) {
++        mImsFeatureCapabilities = changeCapability(mImsFeatureCapabilities, capability, enabled);
++        return mImsFeatureCapabilities;
++    }
++
++    @Override
++    public boolean equals (Object o) {
++        if (o == null) {
++            return false;
++        }
++
++        ImsFeatureCapability i;
++        try {
++            i = (ImsFeatureCapability) o;
++        } catch (ClassCastException ex) {
++            return false;
++        }
++        return mImsFeatureCapabilities == i.mImsFeatureCapabilities;
++    }
++
++    @Override
++    public String toString() {
++        StringBuilder builder = new StringBuilder();
++        builder.append("[ImsFeatureCapability capabilities:");
++        if (can(CAPABILITY_VOLTE)) {
++            builder.append(" CAPABILITY_VOLTE");
++        }
++        if (can(CAPABILITY_VILTE)) {
++            builder.append(" CAPABILITY_VILTE");
++        }
++        if (can(CAPABILITY_VOWIFI)) {
++            builder.append(" CAPABILITY_VOWIFI");
++        }
++        if (can(CAPABILITY_VIWIFI)) {
++            builder.append(" CAPABILITY_VIWIFI");
++        }
++        if (can(CAPABILITY_UTLTE)) {
++            builder.append(" CAPABILITY_UTLTE");
++        }
++        if (can(CAPABILITY_UTWIFI)) {
++            builder.append(" CAPABILITY_UTWIFI");
++        }
++        builder.append("]");
++        return builder.toString();
++    }
++
++    /**
++     * Set ImsFeatureCapability based on the IMS features settings arrary.
++     * The length of the boolean arrary must be FEATURE_TYPE_LENGTH
++     *
++     * @param imsFeatureEnabled IMS features settings arrary
++     */
++    public void setFromBoolArrary(boolean[] imsFeatureEnabled) {
++        if (imsFeatureEnabled == null || imsFeatureEnabled.length != FEATURE_TYPE_LENGTH) {
++            return;
++        }
++        for (int i = FEATURE_TYPE_VOICE_OVER_LTE; i <= FEATURE_TYPE_UT_OVER_WIFI; i++) {
++            changeCapability(IMS_CAPABILITY_MAP.get(i), imsFeatureEnabled[i]);
++        }
++    }
++
++    /**
++     * Set IMS features settings arrary based on ImsFeatureCapability.
++     * The length of the boolean arrary must be FEATURE_TYPE_LENGTH
++     *
++     * @param imsFeatureEnabled IMS features settings arrary
++     */
++    public void fillInBoolArrary(boolean[] imsFeatureEnabled) {
++        if (imsFeatureEnabled == null || imsFeatureEnabled.length != FEATURE_TYPE_LENGTH) {
++            return;
++        }
++        for (int i = FEATURE_TYPE_VOICE_OVER_LTE; i <= FEATURE_TYPE_UT_OVER_WIFI; i++) {
++            imsFeatureEnabled[i] = can(IMS_CAPABILITY_MAP.get(i));
++        }
++    }
++
++    /**
++     * Set ImsFeatureCapability based on intent notifier map.
++     *
++     * @param m intent notifier map
++     */
++    private void setFromNotifierBundle(Bundle m) {
++        changeCapability(CAPABILITY_VOLTE, m.getBoolean("voLTE"));
++        changeCapability(CAPABILITY_VILTE, m.getBoolean("viLTE"));
++        changeCapability(CAPABILITY_VOWIFI, m.getBoolean("voWiFi"));
++        changeCapability(CAPABILITY_VIWIFI, m.getBoolean("viWiFi"));
++        changeCapability(CAPABILITY_UTLTE, m.getBoolean("utLTE"));
++        changeCapability(CAPABILITY_UTWIFI, m.getBoolean("utWiFi"));
++    }
++
++    /**
++     * Set intent notifier Bundle based on ImsFeatureCapability.
++     *
++     * @param m intent notifier Bundle
++     */
++    public void fillInNotifierBundle(Bundle m) {
++        m.putBoolean("voLTE", can(CAPABILITY_VOLTE));
++        m.putBoolean("viLTE", can(CAPABILITY_VILTE));
++        m.putBoolean("voWiFi", can(CAPABILITY_VOWIFI));
++        m.putBoolean("viWiFi", can(CAPABILITY_VIWIFI));
++        m.putBoolean("utLTE", can(CAPABILITY_UTLTE));
++        m.putBoolean("utWiFi", can(CAPABILITY_UTWIFI));
++    }
++
++    /**
++     * Get VoLTE enabled state
++     * Similar with
++     * {@link com.android.internal.telephony.imsphone.ImsPhoneCallTracker#isVolteEnabled}
++     *
++     * @return {@code True} if VoLTE is enabled, {@code false} otherwise
++     */
++    public boolean isVolteEnabled() {
++        return can(CAPABILITY_VOLTE);
++    }
++
++    /**
++     * Get ViLTE enabled state
++     *
++     * @return {@code True} if ViLTE is enabled, {@code false} otherwise
++     */
++    public boolean isViLTEEnabled() {
++        return can(CAPABILITY_VILTE);
++    }
++
++    /**
++     * Get VoWiFi enabled state
++     * Similar with
++     * {@link com.android.internal.telephony.imsphone.ImsPhoneCallTracker#isVowifiEnabled}
++     *
++     * @return {@code True} if VoWiFi is enabled, {@code false} otherwise
++     */
++    public boolean isVowifiEnabled() {
++        return can(CAPABILITY_VOWIFI);
++    }
++
++    /**
++     * Get ViWiFi enabled state
++     *
++     * @return {@code True} if ViWiFi is enabled, {@code false} otherwise
++     */
++    public boolean isViWiFiEnabled() {
++        return can(CAPABILITY_VIWIFI);
++    }
++
++    /**
++     * Get UtLTE enabled state
++     *
++     * @return {@code True} if UtLTE is enabled, {@code false} otherwise
++     */
++    public boolean isUtLTEEnabled() {
++        return can(CAPABILITY_UTLTE);
++    }
++
++    /**
++     * Get UtWiFi enabled state
++     *
++     * @return {@code True} if UtWiFi is enabled, {@code false} otherwise
++     */
++    public boolean isUtWiFiEnabled() {
++        return can(CAPABILITY_UTWIFI);
++    }
++
++    /**
++     * Get Video call enabled state
++     * Similar with
++     * {@link com.android.internal.telephony.imsphone.ImsPhoneCallTracker#isVideoCallEnabled}
++     *
++     * @return {@code True} if Video call is enabled, {@code false} otherwise
++     */
++    public boolean isVideoCallEnabled() {
++        return isViLTEEnabled() || isViWiFiEnabled();
++    }
++
++    /**
++     * Get Ut enabled state
++     * Similar with
++     * {@link com.android.internal.telephony.imsphone.ImsPhoneCallTracker#isUtEnabled}
++     *
++     * @return {@code True} if Ut is enabled, {@code false} otherwise
++     */
++    public boolean isUtEnabled() {
++        return isUtLTEEnabled() || isUtWiFiEnabled();
++    }
++}
+diff --git a/telephony/java/android/telephony/PhoneStateListener.java b/telephony/java/android/telephony/PhoneStateListener.java
+index bb2b447..f018d9f 100644
+--- a/telephony/java/android/telephony/PhoneStateListener.java
++++ b/telephony/java/android/telephony/PhoneStateListener.java
+@@ -228,6 +228,25 @@ public class PhoneStateListener {
+      */
+     public static final int LISTEN_CARRIER_NETWORK_CHANGE                   = 0x00010000;
+ 
++    /**
++     * Listen for IMS registered state changes.
++     *
++     * @see #onImsRegisteredChanged
++     * @see TelephonyRegistry#notifyImsRegisteredChangedForSubscriber(int, boolean)
++     * @hide
++     */
++    public static final int LISTEN_IMS_REGISTERED_STATE_CHANGE              = 0x00020000;
++
++    /**
++     * Listen for carrier network changes indicated by a carrier app.
++     *
++     * @see #onImsFeatureCapabilityChanged
++     * @see TelephonyRegistry#notifyImsFeatureCapabilityChangedForSubscriber(
++     *          int, ImsFeatureCapability)
++     * @hide
++     */
++    public static final int LISTEN_IMS_FEATURE_CAPABILITY_CHANGE            = 0x00040000;
++
+      /*
+      * Subscription used to listen to the phone state changes
+      * @hide
+@@ -333,7 +352,13 @@ public class PhoneStateListener {
+                     case LISTEN_CARRIER_NETWORK_CHANGE:
+                         PhoneStateListener.this.onCarrierNetworkChange((boolean)msg.obj);
+                         break;
+-
++                    case LISTEN_IMS_REGISTERED_STATE_CHANGE:
++                        PhoneStateListener.this.onImsRegisteredChanged((boolean)msg.obj);
++                        break;
++                    case LISTEN_IMS_FEATURE_CAPABILITY_CHANGE:
++                        PhoneStateListener.this.onImsFeatureCapabilityChanged(
++                                (ImsFeatureCapability)msg.obj);
++                        break;
+                 }
+             }
+         };
+@@ -532,6 +557,34 @@ public class PhoneStateListener {
+     }
+ 
+     /**
++     * Callback invoked when IMS registered state is changed
++     * {@link com.android.server.TelephonyRegistry#notifyImsRegisteredChangedForSubscriber(
++     *         int, boolean)}
++     *
++     * @param imsRegistered {@code true} if IMS is registered,
++     *                      {@code false} otherwise.
++     *
++     * @hide
++     */
++    public void onImsRegisteredChanged(boolean imsRegistered) {
++        // default implementation empty
++    }
++
++    /**
++     * Callback invoked when IMS feature capabilities are changed
++     * {@link com.android.server.TelephonyRegistry#notifyImsFeatureCapabilityChangedForSubscriber(
++     *         int, ImsFeatureCapability)}
++     *
++     * @param imsFeatureCapability The IMS feature capabilities
++     *                             {@link android.telephony.ImsFeatureCapability}
++     *
++     * @hide
++     */
++    public void onImsFeatureCapabilityChanged(ImsFeatureCapability imsFeatureCapability) {
++        // default implementation empty
++    }
++
++    /**
+      * The callback methods need to be called on the handler thread where
+      * this object was created.  If the binder did that for us it'd be nice.
+      *
+@@ -626,6 +679,14 @@ public class PhoneStateListener {
+         public void onCarrierNetworkChange(boolean active) {
+             send(LISTEN_CARRIER_NETWORK_CHANGE, 0, 0, active);
+         }
++
++        public void onImsRegisteredChanged(boolean imsRegistered) {
++            send(LISTEN_IMS_REGISTERED_STATE_CHANGE, 0, 0, imsRegistered);
++        }
++
++        public void onImsFeatureCapabilityChanged(ImsFeatureCapability imsFeatureCapability) {
++            send(LISTEN_IMS_FEATURE_CAPABILITY_CHANGE, 0, 0, imsFeatureCapability);
++        }
+     }
+ 
+     IPhoneStateListener callback = new IPhoneStateListenerStub(this);
+diff --git a/telephony/java/com/android/internal/telephony/IPhoneStateListener.aidl b/telephony/java/com/android/internal/telephony/IPhoneStateListener.aidl
+index cbedb95..51df973 100644
+--- a/telephony/java/com/android/internal/telephony/IPhoneStateListener.aidl
++++ b/telephony/java/com/android/internal/telephony/IPhoneStateListener.aidl
+@@ -21,6 +21,7 @@ import android.telephony.ServiceState;
+ import android.telephony.SignalStrength;
+ import android.telephony.CellInfo;
+ import android.telephony.DataConnectionRealTimeInfo;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.PreciseCallState;
+ import android.telephony.PreciseDataConnectionState;
+ import android.telephony.VoLteServiceState;
+@@ -45,5 +46,7 @@ oneway interface IPhoneStateListener {
+     void onVoLteServiceStateChanged(in VoLteServiceState lteState);
+     void onOemHookRawEvent(in byte[] rawData);
+     void onCarrierNetworkChange(in boolean active);
++    void onImsRegisteredChanged(in boolean imsRegistered);
++    void onImsFeatureCapabilityChanged(in ImsFeatureCapability imsFeatureCapability);
+ }
+ 
+diff --git a/telephony/java/com/android/internal/telephony/ITelephonyRegistry.aidl b/telephony/java/com/android/internal/telephony/ITelephonyRegistry.aidl
+index 2c6be62..1f05173 100644
+--- a/telephony/java/com/android/internal/telephony/ITelephonyRegistry.aidl
++++ b/telephony/java/com/android/internal/telephony/ITelephonyRegistry.aidl
+@@ -21,6 +21,7 @@ import android.net.LinkProperties;
+ import android.net.NetworkCapabilities;
+ import android.os.Bundle;
+ import android.telephony.CellInfo;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.ServiceState;
+ import android.telephony.SignalStrength;
+ import android.telephony.CellInfo;
+@@ -68,4 +69,7 @@ interface ITelephonyRegistry {
+     void notifyOemHookRawEventForSubscriber(in int subId, in byte[] rawData);
+     void notifySubscriptionInfoChanged();
+     void notifyCarrierNetworkChange(in boolean active);
++    void notifyImsRegisteredChangedForSubscriber(in int subId, in boolean isImsRegistered);
++    void notifyImsFeatureCapabilityChangedForSubscriber(in int subId,
++            in ImsFeatureCapability imsFeatureCapability);
+ }

@@ -1,0 +1,26 @@
+diff --git a/res/values-de/cm_strings.xml b/res/values-de/cm_strings.xml
+index b968d7b..6d90120 100644
+--- a/res/values-de/cm_strings.xml
++++ b/res/values-de/cm_strings.xml
+@@ -143,6 +143,7 @@
+     <string name="app_ops_labels_read_icc_sms">ICC-SMS lesen</string>
+     <string name="app_ops_labels_write_icc_sms">ICC-SMS schreiben</string>
+     <string name="app_ops_labels_modify_settings">Einstellungen ändern</string>
++    <string name="app_ops_labels_draw_on_top">Draw on top</string>
+     <string name="app_ops_labels_access_notifications">Auf Benachrichtigungen zugreifen</string>
+     <string name="app_ops_labels_camera">Kamera</string>
+     <string name="app_ops_labels_record_audio">Audio aufzeichnen</string>
+@@ -313,10 +314,13 @@
+     <string name="hotstpot_inactivity_timeout_summary_text">Mobiler WLAN-Hotspot wird nach <xliff:g id="timeout">%1$s</xliff:g> abgeschaltet</string>
+     <string name="data_usage_app_restrict_data_category_title">Mobilfunkdatenzugriff</string>
+     <string name="data_usage_app_restrict_wifi_category_title">WLAN-Datenzugriff</string>
++    <string name="data_usage_app_restrict_vpn_category_title">VPN-Datenzugriff</string>
+     <string name="data_usage_app_restrict_all_data_title">Alle Mobilfunkdatenzugriffe deaktivieren</string>
+     <string name="data_usage_app_restrict_all_data_summary">Jegliche Mobilfunkdatenzugriffe verhindern</string>
+     <string name="data_usage_app_restrict_all_wifi_title">Alle WLAN-Datenzugriffe deaktivieren</string>
+     <string name="data_usage_app_restrict_all_wifi_summary">Jegliche WLAN-Datenzugriffe verhindern</string>
++    <string name="data_usage_app_restrict_all_vpn_title">Alle VPN Datenzugriffe deaktivieren</string>
++    <string name="data_usage_app_restrict_all_vpn_summary">Jegliche Datenzugriffe über VPN verhindern</string>        
+     <string name="volume_link_notification_title">Gleiche Lautstärke für Klingelton und Benachrichtigungen</string>
+     <string name="headset_connect_player_title">Musik-App starten</string>
+     <string name="headset_connect_player_summary">Beim Anschließen eines Kopfhörers die Standard-Musik-App starten</string>

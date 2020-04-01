@@ -1,0 +1,15 @@
+diff --git a/packages/SettingsProvider/res/values/defaults.xml b/packages/SettingsProvider/res/values/defaults.xml
+index 9b50dc0..3df6b30 100644
+--- a/packages/SettingsProvider/res/values/defaults.xml
++++ b/packages/SettingsProvider/res/values/defaults.xml
+@@ -23,8 +23,8 @@
+     <bool name="def_airplane_mode_on">false</bool>
+     <bool name="def_theater_mode_on">false</bool>
+     <!-- Comma-separated list of bluetooth, wifi, and cell. -->
+-    <string name="def_airplane_mode_radios" translatable="false">cell,bluetooth,wifi,nfc,wimax</string>
+-    <string name="airplane_mode_toggleable_radios" translatable="false">bluetooth,wifi,nfc</string>
++    <string name="def_airplane_mode_radios" translatable="false">cell,bluetooth,wifi,nfc,wimax,ant</string>
++    <string name="airplane_mode_toggleable_radios" translatable="false">bluetooth,wifi,nfc,ant</string>
+     <string name="def_bluetooth_disabled_profiles" translatable="false">0</string>
+     <bool name="def_auto_time">true</bool>
+     <bool name="def_auto_time_zone">true</bool>

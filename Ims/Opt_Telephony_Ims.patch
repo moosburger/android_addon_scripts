@@ -1,0 +1,270 @@
+diff --git a/src/java/com/android/internal/telephony/DefaultPhoneNotifier.java b/src/java/com/android/internal/telephony/DefaultPhoneNotifier.java
+index 0c23cf8..49651d1 100644
+--- a/src/java/com/android/internal/telephony/DefaultPhoneNotifier.java
++++ b/src/java/com/android/internal/telephony/DefaultPhoneNotifier.java
+@@ -22,6 +22,7 @@ import android.os.Bundle;
+ import android.os.RemoteException;
+ import android.os.ServiceManager;
+ import android.telephony.CellInfo;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.Rlog;
+ import android.telephony.VoLteServiceState;
+ import android.telephony.ServiceState;
+@@ -293,6 +294,30 @@ public class DefaultPhoneNotifier implements PhoneNotifier {
+         }
+     }
+ 
++    public void notifyImsRegisteredChanged(Phone sender, boolean isImsRegistered) {
++        int subId = sender.getSubId();
++        try {
++            if (mRegistry != null) {
++                mRegistry.notifyImsRegisteredChangedForSubscriber(subId, isImsRegistered);
++            }
++        } catch (RemoteException ex) {
++            // system process is dead
++        }
++    }
++
++    public void notifyImsFeatureCapabilityChanged(Phone sender,
++            ImsFeatureCapability imsFeatureCapability) {
++        int subId = sender.getSubId();
++        try {
++            if (mRegistry != null) {
++                mRegistry.notifyImsFeatureCapabilityChangedForSubscriber(
++                        subId, imsFeatureCapability);
++            }
++        } catch (RemoteException ex) {
++            // system process is dead
++        }
++    }
++
+     @Override
+     public void notifyOemHookRawEventForSubscriber(int subId, byte[] rawData) {
+         try {
+diff --git a/src/java/com/android/internal/telephony/GsmCdmaPhone.java b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
+index c9a1c7e..6cf3d93 100644
+--- a/src/java/com/android/internal/telephony/GsmCdmaPhone.java
++++ b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
+@@ -680,6 +680,23 @@ public class GsmCdmaPhone extends Phone {
+         mNotifier.notifyCallForwardingChanged(this);
+     }
+ 
++    /**
++     * {@inheritDoc}
++     *
++     * Probably called from
++     * {@link com.android.internal.telephony.ServiceStateTracker#setImsRegistered(boolean)}
++     */
++    @Override
++    public void notifyImsRegisteredChanged() {
++        if (mImsPhone != null) {
++            // According to {@link com.android.internal.telephony.Phone#isImsRegistered()},
++            // if mImsPhone is not null, the IMS registered state of ImsPhone should be prioritized.
++            // So ignore to notify IMS registered changed event.
++            return;
++        }
++        super.notifyImsRegisteredChanged();
++    }
++
+     // override for allowing access from other classes of this package
+     /**
+      * {@inheritDoc}
+diff --git a/src/java/com/android/internal/telephony/Phone.java b/src/java/com/android/internal/telephony/Phone.java
+index 772aa39..c95a25a 100644
+--- a/src/java/com/android/internal/telephony/Phone.java
++++ b/src/java/com/android/internal/telephony/Phone.java
+@@ -2792,6 +2792,13 @@ public abstract class Phone extends Handler implements PhoneInternalInterface {
+     }
+ 
+     /**
++     * Notify registrants if IMS Registered state is changed.
++     */
++    public void notifyImsRegisteredChanged() {
++        mNotifier.notifyImsRegisteredChanged(this, isImsRegistered());
++    }
++
++    /**
+      * Notify registrants of a RING event.
+      */
+     private void notifyIncomingRing() {
+diff --git a/src/java/com/android/internal/telephony/PhoneNotifier.java b/src/java/com/android/internal/telephony/PhoneNotifier.java
+index 02f15d9..e0f8cb0 100644
+--- a/src/java/com/android/internal/telephony/PhoneNotifier.java
++++ b/src/java/com/android/internal/telephony/PhoneNotifier.java
+@@ -17,6 +17,7 @@
+ package com.android.internal.telephony;
+ 
+ import android.telephony.CellInfo;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.VoLteServiceState;
+ 
+ import java.util.List;
+@@ -59,5 +60,10 @@ public interface PhoneNotifier {
+ 
+     public void notifyVoLteServiceStateChanged(Phone sender, VoLteServiceState lteState);
+ 
++    public void notifyImsRegisteredChanged(Phone sender, boolean isImsRegistered);
++
++    public void notifyImsFeatureCapabilityChanged(Phone sender,
++            ImsFeatureCapability imsFeatureCapability);
++
+     public void notifyOemHookRawEventForSubscriber(int subId, byte[] rawData);
+ }
+diff --git a/src/java/com/android/internal/telephony/ServiceStateTracker.java b/src/java/com/android/internal/telephony/ServiceStateTracker.java
+index abbc1f7..b5aa8d4 100644
+--- a/src/java/com/android/internal/telephony/ServiceStateTracker.java
++++ b/src/java/com/android/internal/telephony/ServiceStateTracker.java
+@@ -954,7 +954,7 @@ public class ServiceStateTracker extends Handler {
+                 ar = (AsyncResult) msg.obj;
+                 if (ar.exception == null) {
+                     int[] responseArray = (int[])ar.result;
+-                    mImsRegistered = (responseArray[0] == 1) ? true : false;
++                    setImsRegistered((responseArray[0] == 1) ? true : false);
+                 }
+                 break;
+ 
+@@ -4851,6 +4851,14 @@ public class ServiceStateTracker extends Handler {
+     public boolean isImsRegistered() {
+         return mImsRegistered;
+     }
++
++    private void setImsRegistered(boolean value) {
++        if (mImsRegistered != value) {
++            mImsRegistered = value;
++            mPhone.notifyImsRegisteredChanged();
++        }
++    }
++
+     /**
+      * Verifies the current thread is the same as the thread originally
+      * used in the initialization of this instance. Throws RuntimeException
+diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhone.java b/src/java/com/android/internal/telephony/imsphone/ImsPhone.java
+index 9e71121..86b3378 100644
+--- a/src/java/com/android/internal/telephony/imsphone/ImsPhone.java
++++ b/src/java/com/android/internal/telephony/imsphone/ImsPhone.java
+@@ -1496,7 +1496,10 @@ public class ImsPhone extends ImsPhoneBase {
+     }
+ 
+     public void setImsRegistered(boolean value) {
+-        mImsRegistered = value;
++        if (mImsRegistered != value) {
++            mImsRegistered = value;
++            notifyImsRegisteredChanged();
++        }
+     }
+ 
+     @Override
+diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhoneBase.java b/src/java/com/android/internal/telephony/imsphone/ImsPhoneBase.java
+index 3899785..8b0f1cf 100644
+--- a/src/java/com/android/internal/telephony/imsphone/ImsPhoneBase.java
++++ b/src/java/com/android/internal/telephony/imsphone/ImsPhoneBase.java
+@@ -25,6 +25,7 @@ import android.os.RegistrantList;
+ import android.os.SystemProperties;
+ import android.telephony.CellInfo;
+ import android.telephony.CellLocation;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.ServiceState;
+ import android.telephony.SignalStrength;
+ import android.telephony.Rlog;
+@@ -233,6 +234,14 @@ abstract class ImsPhoneBase extends Phone {
+         super.notifyServiceStateChangedP(ss);
+     }
+ 
++    /**
++     * Notify registrants of a change of IMS Feature capability.
++     */
++    protected void notifyImsFeatureCapabilityChanged(
++            ImsFeatureCapability imsFeatureCapability) {
++        mNotifier.notifyImsFeatureCapabilityChanged(this, imsFeatureCapability);
++    }
++
+     @Override
+     public void notifyCallForwardingIndicator() {
+         mNotifier.notifyCallForwardingChanged(this);
+diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java b/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
+index bae3ab3..34aa1cb 100644
+--- a/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
++++ b/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
+@@ -40,6 +40,7 @@ import android.telecom.ConferenceParticipant;
+ import android.telecom.VideoProfile;
+ import android.telephony.CarrierConfigManager;
+ import android.telephony.DisconnectCause;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.PhoneNumberUtils;
+ import android.telephony.Rlog;
+ import android.telephony.ServiceState;
+@@ -2281,7 +2282,8 @@ public class ImsPhoneCallTracker extends CallTracker implements ImsPullCall {
+         public void onFeatureCapabilityChanged(int serviceClass,
+                 int[] enabledFeatures, int[] disabledFeatures) {
+             if (serviceClass == ImsServiceClass.MMTEL) {
+-                boolean tmpIsVideoCallEnabled = isVideoCallEnabled();
++                ImsFeatureCapability preImsFeatureCapability =
++                        ImsFeatureCapability.newFromBoolArrary(mImsFeatureEnabled);
+                 // Check enabledFeatures to determine capabilities. We ignore disabledFeatures.
+                 StringBuilder sb;
+                 if (DBG) {
+@@ -2319,7 +2321,7 @@ public class ImsPhoneCallTracker extends CallTracker implements ImsPullCall {
+                 if (DBG) {
+                     log(sb.toString());
+                 }
+-                if (tmpIsVideoCallEnabled != isVideoCallEnabled()) {
++                if (preImsFeatureCapability.isVideoCallEnabled() != isVideoCallEnabled()) {
+                     mPhone.notifyForVideoCapabilityChanged(isVideoCallEnabled());
+                 }
+ 
+@@ -2327,8 +2329,13 @@ public class ImsPhoneCallTracker extends CallTracker implements ImsPullCall {
+                             + ", isVideoCallEnabled=" + isVideoCallEnabled()
+                             + ", isVowifiEnabled=" + isVowifiEnabled()
+                             + ", isUtEnabled=" + isUtEnabled());
+-
+-                mPhone.onFeatureCapabilityChanged();
++                
++                ImsFeatureCapability curImsFeatureCapability =
++                        ImsFeatureCapability.newFromBoolArrary(mImsFeatureEnabled);
++                if (!preImsFeatureCapability.equals(curImsFeatureCapability)) {
++                    mPhone.onFeatureCapabilityChanged();
++                    mPhone.notifyImsFeatureCapabilityChanged(curImsFeatureCapability);
++                }
+ 
+                 mMetrics.writeOnImsCapabilities(
+                         mPhone.getPhoneId(), mImsFeatureEnabled);
+@@ -2583,10 +2590,7 @@ public class ImsPhoneCallTracker extends CallTracker implements ImsPullCall {
+         pw.println(" mPhone=" + mPhone);
+         pw.println(" mDesiredMute=" + mDesiredMute);
+         pw.println(" mState=" + mState);
+-        for (int i = 0; i < mImsFeatureEnabled.length; i++) {
+-            pw.println(" " + mImsFeatureStrings[i] + ": "
+-                    + ((mImsFeatureEnabled[i]) ? "enabled" : "disabled"));
+-        }
++        pw.println(ImsFeatureCapability.newFromBoolArrary(mImsFeatureEnabled));
+         pw.println(" mTotalVtDataUsage=" + mTotalVtDataUsage);
+         for (Map.Entry<Integer, Long> entry : mVtDataUsageMap.entrySet()) {
+             pw.println("    id=" + entry.getKey() + " ,usage=" + entry.getValue());
+diff --git a/tests/telephonytests/src/com/android/internal/telephony/mocks/TelephonyRegistryMock.java b/tests/telephonytests/src/com/android/internal/telephony/mocks/TelephonyRegistryMock.java
+index b6ac0e7..c7e86e9 100644
+--- a/tests/telephonytests/src/com/android/internal/telephony/mocks/TelephonyRegistryMock.java
++++ b/tests/telephonytests/src/com/android/internal/telephony/mocks/TelephonyRegistryMock.java
+@@ -23,6 +23,7 @@ import android.os.IBinder;
+ import android.os.RemoteException;
+ import android.os.UserHandle;
+ import android.telephony.CellInfo;
++import android.telephony.ImsFeatureCapability;
+ import android.telephony.ServiceState;
+ import android.telephony.SignalStrength;
+ import android.telephony.SubscriptionManager;
+@@ -311,4 +312,15 @@ public class TelephonyRegistryMock extends ITelephonyRegistry.Stub {
+     public void notifyCarrierNetworkChange(boolean active) {
+         throw new RuntimeException("Not implemented");
+     }
++
++    @Override
++    public void notifyImsRegisteredChangedForSubscriber(int subId, boolean isImsRegistered) {
++        throw new RuntimeException("Not implemented");
++    }
++
++    @Override
++    public void notifyImsFeatureCapabilityChangedForSubscriber(int subId,
++            ImsFeatureCapability imsFeatureCapability) {
++        throw new RuntimeException("Not implemented");
++    }
+ }

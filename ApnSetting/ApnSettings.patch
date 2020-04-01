@@ -1,0 +1,13 @@
+diff --git a/src/com/android/settings/ApnSettings.java b/src/com/android/settings/ApnSettings.java
+index 5bd0876..b619cb4 100644
+--- a/src/com/android/settings/ApnSettings.java
++++ b/src/com/android/settings/ApnSettings.java
+@@ -489,7 +489,7 @@ public class ApnSettings extends RestrictedSettingsFragment implements
+                 localizedName = context.getResources().getString(resId);
+                 Log.d(TAG, "Replaced apn name with localized name");
+             } catch (NotFoundException e) {
+-                Log.e(TAG, "Got execption while getting the localized apn name.", e);
++                //Log.e(TAG, "Got execption while getting the localized apn name.", e);
+             }
+         }
+         return localizedName;
