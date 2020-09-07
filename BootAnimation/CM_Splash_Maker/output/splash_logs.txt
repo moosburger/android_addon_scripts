@@ -1,0 +1,9 @@
+Offset of Picture-1: 512 (Hex: 200 )
+Byte Count of Picture-1: 182028 (Hex: 2c70c )
+
+Offset of Picture-2: 182784 (Hex: 2ca00 )
+Byte Count of Picture-2: 120476 (Hex: 1d69c )
+
+Offset of Picture-3: 303616 (Hex: 4a200 )
+Byte Count of Picture-3: 120480 (Hex: 1d6a0 )
+

@@ -1,5 +1,5 @@
 # android_addon_scripts
-Version 1.1.4
+Version 1.1.5
 
 modifizierte Dateien im LOS 14.1
 
