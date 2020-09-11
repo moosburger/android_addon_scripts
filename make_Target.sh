@@ -47,9 +47,9 @@ cpuLmt=2
 
 maxArrCnt=9
 declare -A FilePatch
-FilePatch[0,0]="Gohan update"
-FilePatch[0,1]="$RootPfad/LOS/packages/Patch/gohan-update.patch"
-FilePatch[0,2]="$RootPfad/LOS/packages/android_device_bq_$target"
+#FilePatch[0,0]="Gohan update"
+#FilePatch[0,1]="$RootPfad/LOS/packages/Patch/gohan-update.patch"
+#FilePatch[0,2]="$RootPfad/LOS/packages/android_device_bq_$target"
 
 FilePatch[1,0]="Ant+"
 FilePatch[1,1]="$RootPfad/LOS/packages/modifizierte/Ant+/ant+AirplaneMode.patch"
@@ -305,7 +305,7 @@ function applyGitPatches {
 
     echo - apply Git Patches
 
-    for ((i=0;i<=$maxArrCnt;i++))
+    for ((i=1;i<=$maxArrCnt;i++))
     do
         echo
         echo - "${FilePatch[$i,0]}"
@@ -342,7 +342,7 @@ function removeGitPatches {
     echo
     echo - remove Git Patch
 
-    for ((i=0;i<=$maxArrCnt;i++))
+    for ((i=1;i<=$maxArrCnt;i++))
     do
         echo
         echo - "${FilePatch[$i,0]}"
@@ -511,6 +511,7 @@ do
 
     echo - device/bq/$target synchen
     cd $RootPfad/LOS/packages/android_device_bq_$target
+    echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
     LOCAL=$(grep -Eoi "^Version.*" ./README.mkdn | sed  s@'Version '@''@)
@@ -522,6 +523,8 @@ do
 
     echo - kernel/bq/msm8976 synchen
     cd $RootPfad/LOS/packages/android_kernel_bq_msm8976
+    #cd $RootPfad/Kernels/android_kernel_bq_msm8976
+    echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
     LOCAL=$(grep -Eoi "EXTRAVERSION .*" ./Makefile | sed  s@'EXTRAVERSION ='@''@)
@@ -533,6 +536,7 @@ do
 
     echo - external/ant-wireless synchen
     cd $RootPfad/LOS/packages/android_external_ant-wireless
+    echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
     LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
@@ -544,15 +548,19 @@ do
 
     echo - vendor/bq/$target synchen
     cd $RootPfad/LOS/$AndroidPath/vendor/bq/$target
+    echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
-    git tag | head -2 | tail -1
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
     git pull
-    git tag | head -2 | tail -1
+    LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
+    echo Version: $LOCAL
     echo
 
     echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/LOS/packages/modifizierte
+    echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
     LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
@@ -573,14 +581,10 @@ do
     echo "+++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen   +++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
-    echo - device/bq/$target kopieren
-    rm -rf device/bq/gohan
-    cp -r $RootPfad/LOS/packages/android_device_bq_gohan/ ./device/bq/gohan/
-    rm -rf device/bq/gohan/.git
-
     echo - kernel/bq/msm8976 kopieren
     rm -rf kernel/bq/msm8976
     cp -r $RootPfad/LOS/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
+    #cp -r $RootPfad/Kernels/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
     rm -rf kernel/bq/msm8976/.git
 
     ########################################################
@@ -591,38 +595,24 @@ do
     #zurueck in den Pfad
     cd $lstPath
 
-    #echo - Ant+
-    #cp $RootPfad/LOS/packages/modifizierte/Ant+/airplane_defaults.xml ./frameworks/base/packages/SettingsProvider/res/values/defaults.xml
-
-    #echo - Signature Spoofing
-    #cp $RootPfad/LOS/packages/modifizierte/microG/frameworks_base_core_res/AndroidManifest.xml ./frameworks/base/core/res/AndroidManifest.xml
-    #cp $RootPfad/LOS/packages/modifizierte/microG/frameworks_base_core_res_res_values/cm_strings.xml ./frameworks/base/core/res/res/values/cm_strings.xml
-    #cp $RootPfad/LOS/packages/modifizierte/microG/frameworks_base_core_res_res_values-de/cm_strings.xml ./frameworks/base/core/res/res/values-de/cm_strings.xml
-    #cp $RootPfad/LOS/packages/modifizierte/microG/frameworks_base_services_core_java_com_android_server/ServiceWatcher.java ./frameworks/base/services/core/java/com/android/server/ServiceWatcher.java
-    #cp $RootPfad/LOS/packages/modifizierte/microG/frameworks_base_services_core_java_com_android_server_pm/PackageManagerService.java ./frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java
-
-    #echo - BqKamera Hack
-    #rm -rf frameworks/base/core/java/LOS/hardware/camera2/impl/CameraMetadataNative.java
-    #cp $RootPfad/LOS/packages/modifizierte/CameraHack/CameraMetadataNative.java ./frameworks/base/core/java/android/hardware/camera2/impl/CameraMetadataNative.java
+    echo
+    echo - device/bq/$target kopieren
+    rm -rf device/bq/$target
+    cp -r $RootPfad/LOS/packages/android_device_bq_gohan/ ./device/bq/$target/
+    rm -rf device/bq/$target/.git
+    echo - done
 
     echo
     echo - external/ant-wireless kopieren
     rm -rf external/ant-wireless
     cp -r $RootPfad/LOS/packages/android_external_ant-wireless/ ./external/ant-wireless/
     rm -rf external/ant-wireless/.git
+    echo - done
 
-    #echo - die Lautstaerke Aenderungen und die VPN Uebersetzungen
-    #cp $RootPfad/LOS/packages/modifizierte/Translations/cm_strings.xml ./packages/apps/Settings/res/values-de/cm_strings.xml
-    #cp $RootPfad/LOS/packages/modifizierte/Loudness/default_volume_tables.xml ./frameworks/av/services/audiopolicy/config/default_volume_tables.xml
-
-    #cp $RootPfad/LOS/packages/utils.c ./device/qcom/common/power/utils.c Fehler in der interaction function
-    #cp -r $RootPfad/LOS/packages/modifizierte/ApnSettings.java ./packages/apps/Settings/src/com/android/settings/ApnSettings.java
-
-    #echo
-    #echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    #echo "+++++++++++++++++++++++++++++++++++ Dateien austauschen, patchen, hinzufuegen  beendet ++++++++++++++"
-    #echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    #echo
+    echo
+    echo - vendor/cm/bootanimation kopieren
+    cp -r $RootPfad/LOS/packages/modifizierte/BootAnimation/bootanimationRing/bootanimation.tar ./vendor/cm/bootanimation/bootanimation.tar
+    echo - done
 
 #exit
 
