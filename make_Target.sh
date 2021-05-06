@@ -8,10 +8,30 @@
 #pragma GCC diagnostic pop
 # repo -> #!/usr/bin/env python3.5.2
 
+#sudo update-alternatives --config python /usr/bin/python2
+#Es gibt 2 Auswahlmöglichkeiten für die Alternative python (welche /usr/bin/python bereitstellen).
+#
+#  Auswahl      Pfad              Priorität Status
+#------------------------------------------------------------
+#  0            /usr/bin/python3   2         automatischer Modus
+#  1            /usr/bin/python2   1         manueller Modus
+#  2            /usr/bin/python3   2         manueller Modus
+#
+#Drücken Sie die Eingabetaste, um die aktuelle Wahl[*] beizubehalten,
+#oder geben Sie die Auswahlnummer ein:
+
 ##########################################################################################################
 # Import
 ##########################################################################################################
 source ./lineageos-gerrit-repopick-topic.sh
+
+#++++++++++++++++++++++++++++++++++#
+#++++++++++++++++++++++++++++++++++#
+# Beenden nachdem alles aktualisiert wurde
+checkBuildOnly=false
+#++++++++++++++++++++++++++++++++++#
+#++++++++++++++++++++++++++++++++++#
+
 
 #++++++++++++++++++++++++++++++++++#
 # Nur mal kurz aufräumen
@@ -25,9 +45,16 @@ repoSync=true
 
 #++++++++++++++++++++++++++++++++++#
 # RepoPick, wenn Gerrit nicht rechtzeitig gepusht wurde
+#
+# bei Problemen wie "PFAD you need to resolve your current index first" schlägt force-sync usw. fehl
+# cd PFAD && git cherry-pick --abort && git merge --abort && git clean -fdx && git checkout '*'
+# es können die patches auch in anderer Reihenfolge ggepickt werden.  Kann passieren wenn diese in falscher Reihenfolge sortiert sind , dann gibts auch git Fehler
+# repopick 286097 285833 285834
+#
 repoPick=false
 # der zu pickende Commit
-gerritSecurityPatch=n-asb-2020-08
+gerritSecurityPatch=n-asb-2021-04
+#gerritSecurityPatch2=n-asb-2021-02
 #++++++++++++++++++++++++++++++++++#
 
 ##########################################################################################################
@@ -38,12 +65,14 @@ buildDate=$(date +%Y%m%d)
 
 RootPfad=$PWD
 AndroidPath=lineage14.1
-CertPfad=/media/lta-user/Backup
+#CertPfad=/media/lta-user/Backup
+CertPfad=$PWD
 limitCpu=false
 clearBuild=false
 target=gohan
 kernel=msm8976
 cpuLmt=2
+rebuild=false
 
 maxArrCnt=9
 declare -A FilePatch
@@ -200,9 +229,9 @@ function newPatchesAvailable {
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
     LOCAL=$(grep -Eoi "PLATFORM_SECURITY_PATCH := .*" ./build/core/version_defaults.mk | sed  s@'PLATFORM_SECURITY_PATCH := '@''@)
-    REMOTE=$(curl -sS https://github.com/LineageOS/android_build/blob/cm-14.1/core/version_defaults.mk | grep -Eoi 'PLATFORM_SECURITY_PATCH</span> := [0-9]{4}-[0-9]{2}-[0-9]{2}' | sed  s@'PLATFORM_SECURITY_PATCH</span> := '@''@)
-
     echo - Security Patch Level lokal  : $LOCAL
+
+    REMOTE=$(curl -sS https://github.com/LineageOS/android_build/blob/cm-14.1/core/version_defaults.mk | grep -Eoi 'PLATFORM_SECURITY_PATCH</span> := [0-9]{4}-[0-9]{2}-[0-9]{2}' | sed  s@'PLATFORM_SECURITY_PATCH</span> := '@''@)
     echo - Security Patch Level remote: $REMOTE
 
     # wenn laenge = 0 keine verbindung zum server
@@ -225,10 +254,11 @@ function newPatchesAvailable {
 function whatToBuild {
 
     retVal=0
-    if [ $LOCAL = $REMOTE ]; then
+    if [ $LOCAL > $REMOTE ] || [ $LOCAL = $REMOTE ]; then
         xmessage -buttons "Trotzdem bauen":0,"Beenden":1,"CleanPatches":2  -default "Beenden"-nearmouse "Keine neuen Patches vorhanden"
         retVal=$?
-    else
+        rebuild=true
+    elif  [ $LOCAL < $REMOTE ]; then
         xmessage -buttons "Build!":0,"Beenden":1,"CleanPatches":2 -default "Beenden" -nearmouse "Neue Patches vorhanden"
         retVal=$?
     fi
@@ -394,6 +424,8 @@ whatToBuild
 if [ $cleanOnly = true ]
 then
     removeGitPatches
+    echo
+    rm $RootPfad/LOS/$AndroidPath/.repo/projects/external/chromium-webview.git/shallow.lock
     exit
 fi
 
@@ -433,8 +465,7 @@ then
         echo --force-remove-dirty --force-sync
         repo sync --force-remove-dirty --force-sync --verbose
     else
-        repo sync --verbose
-        #--force-sync
+        repo sync --verbose     #--force-sync
         echo
     fi
 
@@ -451,12 +482,13 @@ then
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo "+++++++++++++++++++++++++++++++++++ Repo Cherry Pick ++++++++++++++++++++++++++++++++++++++++++++++++"
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        echo - repoPick
+        echo - repoPick -t $gerritSecurityPatch
         #repopick_topic $gerritSecurityPatch
         repopick -t $gerritSecurityPatch
+        #repopick -t $gerritSecurityPatch2
         if [ $? -ne 0 ]
         then
-            quit "repopick" "456"
+            quit "repopick" "463"
         fi
     fi
 fi
@@ -465,6 +497,13 @@ fi
 # Android Security Patch Level auslesen
 ##########################################################################################################
 securityPatchDate
+
+if [ $LOCAL < $REMOTE ] && [ $rebuild = false ]
+then
+    echo - Security Patch Level lokal  : $LOCAL
+    echo - Security Patch Level remote: $REMOTE
+    quit "Patchlevelproblem" "482"
+fi
 
 ##########################################################################################################
 # Target bauen
@@ -480,7 +519,7 @@ do
     echo
     if [ $? -ne 0 ]
     then
-        quit "breakfast $target" "461"
+        quit "breakfast $target" "498"
     fi
 
 ##########################################################################################################
@@ -498,7 +537,7 @@ do
         replaceWith="mk_timer schedtool -B -n 10 -e ionice -n 7 make -C \$T -j$cpuLmt \"\$@\""
         sed -i -e "s:${searchString}:${replaceWith}:g" $RootPfad/LOS/$AndroidPath/vendor/cm/build/envsetup.sh
     fi
- ##########################################################################################################
+##########################################################################################################
 # meine git Repos synchen
 ##########################################################################################################
     echo
@@ -523,7 +562,6 @@ do
 
     echo - kernel/bq/msm8976 synchen
     cd $RootPfad/LOS/packages/android_kernel_bq_msm8976
-    #cd $RootPfad/Kernels/android_kernel_bq_msm8976
     echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
@@ -584,7 +622,6 @@ do
     echo - kernel/bq/msm8976 kopieren
     rm -rf kernel/bq/msm8976
     cp -r $RootPfad/LOS/packages/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
-    #cp -r $RootPfad/Kernels/android_kernel_bq_msm8976/ ./kernel/bq/msm8976/
     rm -rf kernel/bq/msm8976/.git
 
     ########################################################
@@ -614,7 +651,17 @@ do
     cp -r $RootPfad/LOS/packages/modifizierte/BootAnimation/bootanimationRing/bootanimation.tar ./vendor/cm/bootanimation/bootanimation.tar
     echo - done
 
-#exit
+    echo
+    echo - Ims Lib kopieren
+    mkdir -p $RootPfad/LOS/$AndroidPath/out/target/product/gohan/system/lib
+    cp $RootPfad/LOS/$AndroidPath/vendor/bq/gohan/imsBq/vendor/app/ims/lib/libimsmedia_jni.so $RootPfad/LOS/$AndroidPath/out/target/product/gohan/system/lib/libimsmedia_jni.so
+    cp $RootPfad/LOS/$AndroidPath/vendor/bq/gohan/imsBq/vendor/app/ims/lib/libimscamera_jni.so $RootPfad/LOS/$AndroidPath/out/target/product/gohan/system/lib/libimscamera_jni.so
+
+
+    if [ $checkBuildOnly = true ]
+    then
+        exit
+    fi
 
 #########################################################################################################
 #
@@ -679,6 +726,11 @@ do
     echo "+++++++++++++++++++++++++++++++++++ Ende signierter Build +++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
+
+
+##########################################################################################################
+# Exit aus der while
+##########################################################################################################
     if [ true = true ]
     then
         break
