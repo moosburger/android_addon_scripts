@@ -1,0 +1,1552 @@
+From 9a54881efcea16b9944ff84664df4fe6afa51892 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 11:21:53 +0100
+Subject: [PATCH 01/22] gohan: init.qom.rc: remove duplicate radio code
+
+---
+ rootdir/etc/init.qcom.rc | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 083a314..d91a867 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -219,11 +219,6 @@ on boot
+     # Allow access for CCID command/response timeout configuration
+     chown system system /sys/module/ccid_bridge/parameters/bulk_msg_timeout
+ 
+-    # Mark the copy complete flag to not completed
+-    write /data/misc/radio/copy_complete 0
+-    chown radio radio /data/misc/radio/copy_complete
+-    chmod 0660 /data/misc/radio/copy_complete
+-
+     write /sys/module/rmnet_usb/parameters/rmnet_data_init 1
+     chown radio radio /sys/devices/virtual/hsicctl/hsicctl0/modem_wait
+ 
+-- 
+2.17.1
+
+
+From 40390e21c84a9f499434f5254a2e507025c0ac60 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 11:21:53 +0100
+Subject: [PATCH 02/22] gohan: init.qom.rc: remove duplicate sdcard paths
+
+---
+ rootdir/etc/init.qcom.rc | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index d91a867..629fbe9 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -46,6 +46,7 @@ on init
+ 
+     write /sys/module/qpnp_rtc/parameters/poweron_alarm 1
+ 
++    # Support legacy path
+     symlink /sdcard /storage/sdcard0
+ 
+     mount pstore pstore /sys/fs/pstore
+@@ -267,11 +268,6 @@ on fs
+     mount vfat /dev/block/bootdevice/by-name/modem /firmware ro context=u:object_r:firmware_file:s0,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337
+     #write /sys/kernel/boot_adsp/boot 1
+ 
+-on post-fs
+-    # Support legacy paths
+-    symlink /sdcard /mnt/sdcard
+-    symlink /sdcard /storage/sdcard0
+-
+ # msm specific files that need to be created on /data
+ on post-fs-data
+     mkdir /data/tombstones 0771 system system
+-- 
+2.17.1
+
+
+From 472ed20658717a5b09846e3efa93a253c8ea9840 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 12:45:49 +0100
+Subject: [PATCH 03/22] gohan: init.qom.rc: remove remains of
+ init.class_main.sh
+
+---
+ rootdir/etc/init.qcom.rc | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 629fbe9..8a11f18 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -468,7 +468,6 @@ on property:ro.bluetooth.ftm_enabled=true
+     start ftmd
+ 
+ on property:vold.decrypt=trigger_restart_framework
+-    start qcom-c_main-sh
+     start config_bluetooth
+     start wcnss-service
+     start config_bt_addr
+-- 
+2.17.1
+
+
+From b913ef972b2cf23a7203533fab3142e3bb0c51fb Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 20:32:16 +0100
+Subject: [PATCH 04/22] gohan: init.qcom.rc: remove qcom system daemon
+
+The necessary binary file does not exist
+---
+ rootdir/etc/init.qcom.rc | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 8a11f18..a955ffb 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -432,11 +432,6 @@ service qfintverify /sbin/qfintverify
+     seclabel u:r:qfips:s0
+     oneshot
+ 
+-service qcomsysd /system/bin/qcom-system-daemon
+-    class main
+-    user root
+-    group root qcom_diag
+-
+ on property:sys.boot_completed=1
+     write /dev/kmsg "Boot completed "
+     write /sys/block/dm-0/queue/read_ahead_kb 128
+-- 
+2.17.1
+
+
+From 1638e9a1077723af1ec50df8ab0323c89630202f Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 20:36:53 +0100
+Subject: [PATCH 05/22] gohan: init.qcom.rc: remove qfintverify
+
+The necessary binary file does not exist
+---
+ rootdir/etc/init.qcom.rc | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index a955ffb..44f428c 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -30,8 +30,6 @@ import init.qcom.usb.rc
+ 
+ on early-init
+     mount debugfs debugfs /sys/kernel/debug
+-    insmod /sbin/qcrypto_module.ko
+-    insmod /sbin/qdrbg_module.ko
+ 
+     mkdir /firmware 0771 system system
+     mkdir /system 0777 root root
+@@ -40,7 +38,6 @@ on early-init
+ 
+ 
+ on init
+-    start qfintverify
+     # Set permissions for persist partition
+     mkdir /persist 0771 system system
+ 
+@@ -426,12 +423,6 @@ on post-fs-data
+     chown root system /sys/devices/soc.0/7af6000.i2c/i2c-6/6-0020/input/input0/wake_gesture
+     chmod 0660 /sys/devices/soc.0/7af6000.i2c/i2c-6/6-0020/input/input0/wake_gesture
+ 
+-service qfintverify /sbin/qfintverify
+-    user root
+-    class core
+-    seclabel u:r:qfips:s0
+-    oneshot
+-
+ on property:sys.boot_completed=1
+     write /dev/kmsg "Boot completed "
+     write /sys/block/dm-0/queue/read_ahead_kb 128
+-- 
+2.17.1
+
+
+From 83bc8976f6c56d5cfb5d03a8e72795f6ee36fe8b Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 21:42:01 +0100
+Subject: [PATCH 06/22] gohan: init.qcom.rc: remove RIDL Client
+
+The necessary binary file does not exist
+---
+ rootdir/etc/init.qcom.rc | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 44f428c..3f72132 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -759,14 +759,6 @@ service set_sn /system/bin/adjust_serialno setsn
+ on property:sys.sn_set=1
+     start set_sn
+ 
+-service RIDL /system/vendor/bin/RIDLClient.exe
+-    class late_start
+-    oneshot
+-    user system
+-    group system inet log sdcard_r sdcard_rw qcom_diag
+-    # removed for security team - misc bluetooth radio gps wifi diag media_rw
+-    # limited to 12 groups.  Unused: audio usb net_bt_admin net_bt_stac net_raw net_admin
+-
+ service qseeproxydaemon /system/vendor/bin/qseeproxydaemon
+     class late_start
+     user system
+-- 
+2.17.1
+
+
+From fb86fcc433c81836476aea7f676ee266a93e4d76 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 11:26:23 +0100
+Subject: [PATCH 07/22] gohan: init.qom.rc: remove remains of LKCore
+
+---
+ rootdir/etc/init.qcom.rc | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 3f72132..ed12e0d 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -764,14 +764,6 @@ service qseeproxydaemon /system/vendor/bin/qseeproxydaemon
+     user system
+     group system
+ 
+-# service for USER
+-service LKCore-rel /system/vendor/bin/LKCore
+-    class late_start
+-    oneshot
+-    disabled
+-    user system
+-    group system log qcom_diag
+-
+ on property:persist.sys.runin=enable
+     write /sys/class/power_supply/battery/device/BatteryTestStatus 1
+     write /sys/devices/soc.0/qpnp-smbcharger-ed730800/BatteryTestStatus 1
+-- 
+2.17.1
+
+
+From 63e5e486bc70ea6c6de32e919e33f173b2067c35 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 26 Jan 2020 19:09:40 +0100
+Subject: [PATCH 08/22] gohan: remove remains dts configurator
+
+---
+ rootdir/etc/init.qcom.rc | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index ed12e0d..314cdb2 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -274,7 +274,6 @@ on post-fs-data
+     mkdir /tombstones/dsps 0771 system system
+     mkdir /persist/data/sfs 0700 system system
+     mkdir /persist/data/tz 0700 system system
+-    mkdir /data/misc/dts 0770 media audio
+     mkdir /data/misc/audio_pp 0771 media audio
+ 
+     # Create directory for TZ Apps
+-- 
+2.17.1
+
+
+From 8c32801bd62fa445802c9df4027ca672eedb5339 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Mon, 27 Jan 2020 22:03:16 +0100
+Subject: [PATCH 09/22] gohan: audio: add required audio files
+
+E audio_route: Failed to open /system/etc/sound_trigger_mixer_paths_wcd9335.xml
+E MCS-RT-CTL: Can't open the configuration file /system/etc/aanc_tuning_mixer.txt
+---
+ audio/aanc_tuning_mixer.txt | 170 ++++++++++++++++++++++++++++++++++++
+ device.mk                   |   2 +
+ 2 files changed, 172 insertions(+)
+ create mode 100644 audio/aanc_tuning_mixer.txt
+
+diff --git a/audio/aanc_tuning_mixer.txt b/audio/aanc_tuning_mixer.txt
+new file mode 100644
+index 0000000..14acbea
+--- /dev/null
++++ b/audio/aanc_tuning_mixer.txt
+@@ -0,0 +1,170 @@
++# Copyright (c) 2014, 2016, The Linux Foundation. All rights reserved.
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions are
++# met:
++#    * Redistributions of source code must retain the above copyright
++#      notice, this list of conditions and the following disclaimer.
++#    * Redistributions in binary form must reproduce the above
++#      copyright notice, this list of conditions and the following
++#      disclaimer in the documentation and/or other materials provided
++#      with the distribution.
++#    * Neither the name of The Linux Foundation nor the names of its
++#      contributors may be used to endorse or promote products derived
++#      from this software without specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++#ANC_TEST_P_PATH_MIC_STEREO Capture
++acdb_dev_id:85
++!Capture
++Txdevice:0
++
++enable
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++AIF1_CAP Mixer SLIM TX7:1
++AIF1_CAP Mixer SLIM TX8:1
++SLIM TX7 MUX:DEC9
++DEC9 MUX:DMIC4
++SLIM TX8 MUX:DEC10
++DEC10 MUX:DMIC3
++SLIM_0_TX Channels:Two
++MultiMedia1 Mixer SLIM_0_TX:1
++
++disable
++MultiMedia1 Mixer SLIM_0_TX:0
++AIF1_CAP Mixer SLIM TX7:0
++AIF1_CAP Mixer SLIM TX8:0
++SLIM TX7 MUX:ZERO
++SLIM TX8 MUX:ZERO
++DEC10 MUX:ZERO
++DEC9 MUX:ZERO
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++
++#ANC_TEST_S_PATH_MIC_STEREO Capture
++acdb_dev_id:88
++!Capture
++Txdevice:0
++
++enable
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++AIF1_CAP Mixer SLIM TX7:1
++AIF1_CAP Mixer SLIM TX8:1
++SLIM TX7 MUX:DEC8
++DEC7 MUX:ANC2_FB
++ANC2 MUX:DMIC3
++SLIM TX8 MUX:DEC7
++DEC8 MUX:ANC1_FB
++ANC1 MUX:DMIC3
++ANC1 FB MUX:EAR_HPH_L
++SLIM_0_TX Channels:Two
++MultiMedia1 Mixer SLIM_0_TX:1
++
++disable
++MultiMedia1 Mixer SLIM_0_TX:0
++AIF1_CAP Mixer SLIM TX7:0
++AIF1_CAP Mixer SLIM TX8:0
++SLIM TX7 MUX:ZERO
++SLIM TX8 MUX:ZERO
++DEC7 MUX:ZERO
++ANC2 MUX:ZERO
++ANC1 MUX:ZERO
++DEC8 MUX:ZERO
++ANC1 FB MUX:ZERO
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++
++#ANC_TEST_E_PATH_MIC_STEREO Capture
++acdb_dev_id:91
++!Capture
++Txdevice:0
++
++enable
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++AIF1_CAP Mixer SLIM TX7:1
++AIF1_CAP Mixer SLIM TX8:1
++SLIM TX7 MUX:DEC8
++DEC7 MUX:ANC2_FB
++ANC2 MUX:DMIC4
++ANC1 MUX:DMIC4
++SLIM TX8 MUX:DEC7
++DEC8 MUX:ANC1_FB
++ANC1 FB MUX:EAR_HPH_L
++SLIM_0_TX Channels:Two
++MultiMedia1 Mixer SLIM_0_TX:1
++
++disable
++MultiMedia1 Mixer SLIM_0_TX:0
++AIF1_CAP Mixer SLIM TX7:0
++AIF1_CAP Mixer SLIM TX8:0
++SLIM TX7 MUX:ZERO
++SLIM TX8 MUX:ZERO
++DEC7 MUX:ZERO
++ANC2 MUX:ZERO
++DEC10 MUX:ZERO
++ANC1 FB MUX:ZERO
++TX7 HPF Switch:0
++TX8 HPF Switch:0
++
++#ANC_TEST_S_PATH_HANDSET_SPKR_ANC_MONO
++acdb_dev_id:86
++!Playback
++Rxdevice:0
++
++enable
++ANC Function:ON
++SLIM RX1 MUX:AIF1_PB
++SLIM_0_RX Channels:One
++RX1 MIX1 INP1:RX1
++CLASS_H_DSM MUX:DSM_HPHL_RX1
++RX1 Digital Volume:87
++DAC1 Switch:1
++ANC Slot:7
++SLIMBUS_0_RX Audio Mixer MultiMedia1:1
++
++disable
++SLIMBUS_0_RX Audio Mixer MultiMedia1:0
++ANC Slot:0
++SLIM RX1 MUX:ZERO
++RX1 MIX1 INP1:ZERO
++RX1 Digital Volume:0
++DAC1 Switch:0
++ANC Function:OFF
++
++#ANC_TEST_E_PATH_HANDSET_SPKR_ANC_MONO
++acdb_dev_id:89
++!Playback
++Rxdevice:0
++
++enable
++ANC Function:ON
++SLIM RX1 MUX:AIF1_PB
++SLIM_0_RX Channels:One
++RX1 MIX1 INP1:RX1
++CLASS_H_DSM MUX:DSM_HPHL_RX1
++RX1 Digital Volume:87
++DAC1 Switch:1
++ANC Slot:8
++SLIMBUS_0_RX Audio Mixer MultiMedia1:1
++
++disable
++SLIMBUS_0_RX Audio Mixer MultiMedia1:0
++ANC Slot:0
++SLIM RX1 MUX:ZERO
++RX1 MIX1 INP1:ZERO
++RX1 Digital Volume:0
++DAC1 Switch:0
++ANC Function:OFF
+diff --git a/device.mk b/device.mk
+index 5039480..17a4958 100644
+--- a/device.mk
++++ b/device.mk
+@@ -87,7 +87,9 @@ PRODUCT_COPY_FILES += \
+     hardware/qcom/audio-caf/msm8952/configs/msm8952_32/sound_trigger_mixer_paths.xml:system/etc/sound_trigger_mixer_paths.xml \
+     hardware/qcom/audio-caf/msm8952/configs/msm8952_32/sound_trigger_mixer_paths_wcd9306.xml:system/etc/sound_trigger_mixer_paths_wcd9306.xml \
+     hardware/qcom/audio-caf/msm8952/configs/msm8952_32/sound_trigger_mixer_paths_wcd9330.xml:system/etc/sound_trigger_mixer_paths_wcd9330.xml \
++    hardware/qcom/audio-caf/msm8952/configs/msm8952_32/sound_trigger_mixer_paths_wcd9335.xml:/system/etc/sound_trigger_mixer_paths_wcd9335.xml \
+     hardware/qcom/audio-caf/msm8952/configs/msm8952_32/sound_trigger_platform_info.xml:system/etc/sound_trigger_platform_info.xml \
++    $(LOCAL_PATH)/audio/aanc_tuning_mixer.txt:system/etc/aanc_tuning_mixer.txt \
+     $(LOCAL_PATH)/audio/audio_platform_info.xml:system/etc/audio_platform_info.xml \
+     $(LOCAL_PATH)/audio/audio_platform_info_extcodec.xml:system/etc/audio_platform_info_extcodec.xml \
+     $(LOCAL_PATH)/audio/mixer_paths_qrd_skun.xml:system/etc/mixer_paths_qrd_skun.xml
+-- 
+2.17.1
+
+
+From 8f4fe0065410c978ea7c5c01ac2578346c8eebf1 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sat, 1 Feb 2020 10:33:10 +0100
+Subject: [PATCH 10/22] gohan: audio: add required camara files
+
+E mm-camera: <IMGLIB><ERROR> 1037: frameproc_comp_load: frameproc_comp_load:1037] cannot load libmmcamera_paaf_lib.so
+E mm-camera: <IMGLIB><ERROR> 1037: frameproc_comp_load: frameproc_comp_load:1037] cannot load libmmcamera_ppeiscore.so
+
+Imported from bq yamcha 1.16.0
+---
+ device.mk                                       |   4 ++++
+ .../system/vendor/lib/libmmcamera_paaf_lib.so   | Bin 0 -> 22116 bytes
+ .../system/vendor/lib/libmmcamera_ppeiscore.so  | Bin 0 -> 42644 bytes
+ 3 files changed, 4 insertions(+)
+ create mode 100644 proprietary/system/vendor/lib/libmmcamera_paaf_lib.so
+ create mode 100644 proprietary/system/vendor/lib/libmmcamera_ppeiscore.so
+
+diff --git a/device.mk b/device.mk
+index 17a4958..c7efd97 100644
+--- a/device.mk
++++ b/device.mk
+@@ -226,6 +226,10 @@ PRODUCT_COPY_FILES += \
+     $(LOCAL_PATH)/configs/sensors/hals.conf:system/etc/sensors/hals.conf \
+     $(LOCAL_PATH)/configs/sensors/sensor_def_qcomdev.conf:system/etc/sensors/sensor_def_qcomdev.conf
+ 
++# Vendor prebuilts
++PRODUCT_COPY_FILES += \
++    $(LOCAL_PATH)/proprietary/system/vendor/lib/libmmcamera_paaf_lib.so:system/vendor/lib/libmmcamera_paaf_lib.so \
++    $(LOCAL_PATH)/proprietary/system/vendor/lib/libmmcamera_ppeiscore.so:system/vendor/lib/libmmcamera_ppeiscore.so
+ 
+ # Wifi
+ PRODUCT_PACKAGES += \
+diff --git a/proprietary/system/vendor/lib/libmmcamera_paaf_lib.so b/proprietary/system/vendor/lib/libmmcamera_paaf_lib.so
+new file mode 100644
+index 0000000000000000000000000000000000000000..59787dc47c4720c9b7a48dd112a624c6ba241fbb
+GIT binary patch
+literal 22116
+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
+F{|683up$5e
+
+literal 0
+HcmV?d00001
+
+diff --git a/proprietary/system/vendor/lib/libmmcamera_ppeiscore.so b/proprietary/system/vendor/lib/libmmcamera_ppeiscore.so
+new file mode 100644
+index 0000000000000000000000000000000000000000..32ff03e61ad08dc647d957629e94a5deef457aa3
+GIT binary patch
+literal 42644
+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
+Yj7j7PE~bgA4AE_WkM}-eB9YPi2eijRTmS$7
+
+literal 0
+HcmV?d00001
+
+-- 
+2.17.1
+
+
+From cfb34b4bf5c7259e9e7a334dbcd670d0a8c219df Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Thu, 9 Aug 2018 13:53:37 +0200
+Subject: [PATCH 11/22] gohan: Add libstagefright_soft_flacdec.so
+
+In the logcat generates the following error:
+  E SoftOMXPlugin: unable to dlopen libstagefright_soft_flacdec.so:
+  dlopen failed: library "libstagefright_soft_flacdec.so" not found
+
+Change-Id: I5826c963666721ed15d8a3e3d14f9deb9d676774
+Signed-off-by: mifl <mifl.pc@gmail.com>
+---
+ proprietary-files.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/proprietary-files.txt b/proprietary-files.txt
+index d95c0b5..87e8de9 100755
+--- a/proprietary-files.txt
++++ b/proprietary-files.txt
+@@ -412,6 +412,7 @@ bin/ipacm-diag
+ vendor/lib/hw/keystore.msm8952.so
+ 
+ # Media
++lib/libstagefright_soft_flacdec.so
+ vendor/lib/libI420colorconvert.so
+ vendor/lib/libmm-color-convertor.so
+ vendor/lib/libOmxAacDec.so
+-- 
+2.17.1
+
+
+From eba2c940a96dd50f7a3dd9ae40392cb68da6915a Mon Sep 17 00:00:00 2001
+From: Ben Romberger <bromberg@codeaurora.org>
+Date: Fri, 14 Nov 2014 11:59:50 -0800
+Subject: [PATCH 12/22] gohan: init.qcom.rc: Add permissions for delta files
+
+Add permissions for ACDB delta file folders.
+Add 770 permissions to /data/audio/acdbdata
+and /data/audio/acdbdata/delta
+
+Change-Id: Ibb8e7602bcc7865a39a11cb064873481e2aa801d
+---
+ rootdir/etc/init.qcom.rc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 314cdb2..a959f0a 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -359,6 +359,10 @@ on post-fs-data
+ 
+     mkdir /data/audio/ 0770 media audio
+ 
++    # Create a folder for audio delta files
++    mkdir /data/audio/acdbdata 0770 media audio
++    mkdir /data/audio/acdbdata/delta 0770 media audio
++
+     setprop vold.post_fs_data_done 1
+ 
+     #Create a folder for SRS to be able to create a usercfg file
+-- 
+2.17.1
+
+
+From 5ed389f1e1099a58aed96b75a2c367c40f724b32 Mon Sep 17 00:00:00 2001
+From: Ben Romberger <bromberg@codeaurora.org>
+Date: Mon, 5 Jan 2015 16:59:57 -0800
+Subject: [PATCH 13/22] gohan: init.qcom.rc: Updated audio calibration delta
+ file path
+
+Audio calibration delta files folder created at
+/data/misc/audio/acdbdata/delta.
+Path changed to provide access to media server.
+Added /data/audio/acdbdata/delta path also
+for backward compatibility
+
+Change-Id: I53031d1aecd3f12a15d76db417d7a8eafd80cf8b
+---
+ rootdir/etc/init.qcom.rc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index a959f0a..fbc4aec 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -309,6 +309,10 @@ on post-fs-data
+     # Create directory used by audio subsystem
+     mkdir /data/misc/audio 0770 audio audio
+ 
++    # Create directory for audio delta files
++    mkdir /data/misc/audio/acdbdata 0770 media audio
++    mkdir /data/misc/audio/acdbdata/delta 0770 media audio
++
+     # Create directory used by the DASH client
+     mkdir /data/misc/dash 0770 media audio
+ 
+-- 
+2.17.1
+
+
+From da23fcf1728163d56934d6cdcd55d2820140e0c6 Mon Sep 17 00:00:00 2001
+From: Maunik Shah <mshah@codeaurora.org>
+Date: Wed, 4 Nov 2015 16:05:26 +0530
+Subject: [PATCH 14/22] gohan: FRP: Add FRP property & persistent data block
+
+- Set "system" as owner of persistent data block
+- Add ro.frp.pst property to PRODUCT_PROPERTY_OVERRIDES
+- Use hardcoded path for now
+
+Change-Id: I431629b5ee0693043e1009c14bee249562f1e7c4
+---
+ rootdir/etc/ueventd.qcom.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rootdir/etc/ueventd.qcom.rc b/rootdir/etc/ueventd.qcom.rc
+index f426efa..4d5619b 100644
+--- a/rootdir/etc/ueventd.qcom.rc
++++ b/rootdir/etc/ueventd.qcom.rc
+@@ -246,4 +246,4 @@
+ /dev/ontario              0640   system     system
+ 
+ # Add device block for FRP
+-/dev/block/bootdevice/by-name/config    0660   system     system
++/dev/block/platform/soc.0/7824900.sdhci/by-name/config    0660   system     system
+-- 
+2.17.1
+
+
+From 814b67292a39f3f493337541b2969c78f8c957e9 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Tue, 28 Nov 2017 12:42:53 +0100
+Subject: [PATCH 15/22] gohan: drop multiuser support to overlay
+
+* Now is enabled by default in android_vendor_cm:
+  https://review.lineageos.org/#/c/197353/
+
+This reverts commit 146368efc14d8dd1630e8a98452477fe6eb2f453.
+
+Change-Id: I830ca336dbe40ff66cebb6c55b6f3631066e8539
+Signed-off-by: mifl <mifl.pc@gmail.com>
+---
+ overlay/frameworks/base/core/res/res/values/config.xml | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/overlay/frameworks/base/core/res/res/values/config.xml b/overlay/frameworks/base/core/res/res/values/config.xml
+index d68a263..4c9fb5c 100644
+--- a/overlay/frameworks/base/core/res/res/values/config.xml
++++ b/overlay/frameworks/base/core/res/res/values/config.xml
+@@ -359,11 +359,6 @@
+     <!-- Set to true to add links to Cell Broadcast app from Settings and MMS app. -->
+     <bool name="config_cellBroadcastAppLinks">true</bool>
+ 
+-    <!-- Maximum number of supported users -->
+-    <integer name="config_multiuserMaximumUsers">4</integer>
+-    <!-- Whether UI for multi user should be shown -->
+-    <bool name="config_enableMultiUserUI">true</bool>
+-
+     <!-- Safe headphone volume index. When music stream volume is below this index
+     the SPL on headphone output is compliant to EN 60950 requirements for portable music
+     players. -->
+-- 
+2.17.1
+
+
+From cbe0b3c36805f1ccefcc12b174c4bf3ab73727a9 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sat, 8 Feb 2020 09:37:20 +0100
+Subject: [PATCH 16/22] gohan: Remove duplicate audio flag
+
+TARGET_USES_QCOM_MM_AUDIO is enable by default.
+
+https://review.lineageos.org/#/c/180752/
+
+Change-Id: I098e441ee8999246312bb49bd94be5da5c9dd5b9
+---
+ BoardConfig.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 5f93b56..0d7decf 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -94,7 +94,6 @@ MM_AUDIO_ENABLED_FTM := true
+ MM_AUDIO_ENABLED_SAFX := true
+ USE_CUSTOM_AUDIO_POLICY := 1
+ USE_XML_AUDIO_POLICY_CONF := 1
+-TARGET_USES_QCOM_MM_AUDIO := true
+ 
+ # Bluetooth
+ BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
+-- 
+2.17.1
+
+
+From af135546d59d86e144ddb68c56c05f86e5db1695 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sat, 8 Feb 2020 09:44:15 +0100
+Subject: [PATCH 17/22] gohan: Remove duplicate Dolby Audio Processing feature
+
+---
+ BoardConfig.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 0d7decf..b2e4446 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -56,7 +56,6 @@ AUDIO_FEATURE_ENABLED_ANC_HEADSET := true
+ AUDIO_FEATURE_ENABLED_APE_OFFLOAD := true
+ AUDIO_FEATURE_ENABLED_AUDIOSPHERE := true
+ AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true
+-AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true
+ # Ext HDMI is enabled in stock, but header files are missing
+ #AUDIO_FEATURE_ENABLED_EXT_HDMI := true
+ AUDIO_FEATURE_ENABLED_EXTN_FLAC_DECODER := true
+-- 
+2.17.1
+
+
+From 42c22d5351ba64a33462453cd9d7edf8fa0b3c85 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Tue, 4 Feb 2020 22:07:04 +0100
+Subject: [PATCH 18/22] gohan: drop the HVDCP daemon
+
+The necessary binary file does not exist
+---
+ rootdir/etc/init.qcom.rc | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index fbc4aec..7faef63 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -659,17 +659,6 @@ service charger /charger
+     group graphics system
+     seclabel u:r:healthd:s0
+ 
+-service hvdcp /system/bin/hvdcp
+-    class main
+-    user root
+-    group root
+-
+-on property:persist.usb.hvdcp.detect=true
+-    start hvdcp
+-
+-on property:persist.usb.hvdcp.detect=false
+-    stop hvdcp
+-
+ service qbcharger /charger -m 1
+     disabled
+     oneshot
+@@ -788,7 +777,6 @@ service seemp_healthd /system/vendor/bin/seemp_healthd
+ on charger
+     wait /dev/block/bootdevice/by-name/system
+     mount ext4 /dev/block/bootdevice/by-name/system /system ro barrier=1
+-    start hvdcp
+     setprop persist.sys.usb.config mass_storage
+ 
+ service mdtpd /system/vendor/bin/mdtpd
+-- 
+2.17.1
+
+
+From 765a3ae7578ba41f5b6ad33a26466a812a13da67 Mon Sep 17 00:00:00 2001
+From: Anirudh Ghayal <aghayal@codeaurora.org>
+Date: Wed, 27 Jan 2016 17:41:49 +0530
+Subject: [PATCH 19/22] gohan: Enable the HVDCP daemon
+
+Enable hvdcp_opti daemon to support QC 3.0.
+
+Change-Id: I008abde33c595e8c56e1702a8c3e31306db94fb7
+---
+ rootdir/etc/init.qcom.rc | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index 7faef63..e0e885d 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -778,6 +778,7 @@ on charger
+     wait /dev/block/bootdevice/by-name/system
+     mount ext4 /dev/block/bootdevice/by-name/system /system ro barrier=1
+     setprop persist.sys.usb.config mass_storage
++    start hvdcp_opti
+ 
+ service mdtpd /system/vendor/bin/mdtpd
+     class late_start
+@@ -803,6 +804,11 @@ service thermal-engine /system/vendor/bin/thermal-engine
+    socket thermal-recv-passive-client stream 0666 system system
+    group root
+ 
++service hvdcp_opti /system/bin/hvdcp_opti
++    class main
++    user root
++    group root
++
+ service time_daemon /system/bin/time_daemon
+    class late_start
+    user root
+-- 
+2.17.1
+
+
+From fc83ae5b1c037b0951d061abaec910c865780881 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Sun, 9 Feb 2020 21:33:02 +0100
+Subject: [PATCH 20/22] gohan: Add missing DRM dependencies
+
+E QSEECOMD: : Init dlopen(libqisl.so, RLTD_NOW) is failed....
+E QSEECOMD: : Init dlopen(libGPreqcancel.so, RLTD_NOW) is failed....
+---
+ proprietary-files.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/proprietary-files.txt b/proprietary-files.txt
+index 87e8de9..e8b7d82 100755
+--- a/proprietary-files.txt
++++ b/proprietary-files.txt
+@@ -309,6 +309,9 @@ vendor/lib/lib-sec-disp.so
+ vendor/lib/libdrmfs.so
+ vendor/lib/libdrmtime.so
+ vendor/lib/libQSEEComAPI.so
++vendor/lib/libGPreqcancel.so
++vendor/lib/libGPreqcancel_svc.so
++vendor/lib/libqisl.so
+ vendor/lib/librpmb.so
+ vendor/lib/libsecureui.so
+ vendor/lib/libsecureui_svcsock.so
+-- 
+2.17.1
+
+
+From 8b163fcab219fbcdcdd9cba1d137335e80a74050 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Wed, 12 Feb 2020 21:17:04 +0100
+Subject: [PATCH 21/22] gohan: rootdir: drop pstore changes
+
+Already included in init.rc
+---
+ rootdir/etc/init.qcom.rc | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/rootdir/etc/init.qcom.rc b/rootdir/etc/init.qcom.rc
+index e0e885d..6243765 100644
+--- a/rootdir/etc/init.qcom.rc
++++ b/rootdir/etc/init.qcom.rc
+@@ -46,15 +46,6 @@ on init
+     # Support legacy path
+     symlink /sdcard /storage/sdcard0
+ 
+-    mount pstore pstore /sys/fs/pstore
+-    chown system log /sys/fs/pstore/console-ramoops-0
+-    chmod 0440 /sys/fs/pstore/console-ramoops-0
+-    chown system log /sys/fs/pstore/annotate-ramoops-0
+-    chmod 0640 /sys/fs/pstore/annotate-ramoops-0
+-    chown system log /sys/fs/pstore/dmesg-ramoops-0
+-    chmod 0640 /sys/fs/pstore/dmesg-ramoops-0
+-
+-
+ on early-boot
+     # set RLIMIT_MEMLOCK to 64MB
+     setrlimit 8 67108864 67108864
+-- 
+2.17.1
+
+
+From 913781a72ebe5a348617f773bfe5493409510ca9 Mon Sep 17 00:00:00 2001
+From: mifl <mifl.pc@gmail.com>
+Date: Wed, 12 Feb 2020 21:24:15 +0100
+Subject: [PATCH 22/22] gohan: Add thermal engine config
+
+---
+ proprietary-files.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/proprietary-files.txt b/proprietary-files.txt
+index e8b7d82..07cdf63 100755
+--- a/proprietary-files.txt
++++ b/proprietary-files.txt
+@@ -534,6 +534,7 @@ vendor/lib/hw/sound_trigger.primary.msm8952.so
+ vendor/lib/libsmwrapper.so
+ 
+ # Thermal
++etc/thermal-engine.conf
+ vendor/bin/thermal-engine
+ vendor/lib/libthermalclient.so
+ vendor/lib/libthermalioctl.so
+-- 
+2.17.1
+

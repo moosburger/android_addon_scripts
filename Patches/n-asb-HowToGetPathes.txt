@@ -1,0 +1,1 @@
+Auf den jeweilgen CR gehen, dort bei den Patchset auf Download und die Checkout Zeile kopieren
