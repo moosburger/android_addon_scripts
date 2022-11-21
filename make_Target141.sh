@@ -49,11 +49,17 @@
 ##########################################################################################################
 # Python Versionscheck und Warnung
 ##########################################################################################################
+
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+pyenv shell 2.7.18
+
 version=$(python -V 2>&1 | grep -Po '(?<=Python )(.+)')
 version=$(echo "${version//}")
 IFS='.' read -ra ADDR <<< "$version"
 
-echo "Python Version $version!"
+echo "Python Version: $version"
 
 ##########################################################################################################
 # Import
@@ -67,7 +73,7 @@ AntPlusBuild=true
 #++++++++++++++++++++++++++++++++++#
 #++++++++++++++++++++++++++++++++++#
 # Beenden nachdem alles aktualisiert wurde
-checkBuildOnly=false
+checkBuildOnly=true
 #++++++++++++++++++++++++++++++++++#
 #++++++++++++++++++++++++++++++++++#
 
@@ -106,8 +112,8 @@ repoPick=false
 buildDate=$(date +%Y%m%d)
 
 RootPfad=$PWD
-AndroidPath=lineage14.1
-#CertPfad=/media/dejhgp07/Android
+AndroidPath=lineage-14.1
+RepoCmd=$RootPfad/bin/repo
 CertPfad=$PWD
 limitCpu=false
 clearBuild=false
@@ -159,7 +165,7 @@ FilePatch[8,1]="$RootPfad/LOS/packages/modifizierte/Loudness/default_volume_tabl
 FilePatch[8,2]="$RootPfad/LOS/$AndroidPath/frameworks/av"
 
 FilePatch[9,0]="Gohan update"
-FilePatch[9,1]="$RootPfad/LOS/packages/Patch/gohan-update.patch"
+FilePatch[9,1]="$RootPfad/LOS/packages/modifizierte/Patch/gohan-update.patch"
 FilePatch[9,2]="$RootPfad/LOS/packages/android_device_bq_$target"
 
 # Pfade zum resetten der Patches
@@ -207,17 +213,6 @@ patchUndo=( "android"
 #
 #
 ##########################################################################################################
-# FunktionsName getTarget
-# details               Auswahl des zu bauenden Bq Targets
-##########################################################################################################
-function getTarget {
-    xmessage -buttons "gohan":0,"tenshi":1 -default "gohan" -nearmouse "Target auswaehlen"
-    if [ $? = 1 ]
-    then
-        target=tenshi
-        kernel=msm8937
-    fi
-}
 
 ##########################################################################################################
 # FunktionsName limitUsedCpu
@@ -240,31 +235,6 @@ function cleanBuild {
     if [ $? = 1 ]
     then
         clearBuild=true
-    fi
-}
-
-##########################################################################################################
-# FunktionsName showFeature
-# details               zeigtdie Zusammenfassung
-##########################################################################################################
-function showFeature {
-
-    msgBuild="nicht geloescht"
-    if [ $clearBuild = true ]
-    then
-        msgBuild="geloescht"
-    fi
-
-    msgCpu="unbegrenzt"
-    if [ $limitCpu = true ]
-    then
-        msgCpu="begrenzt"
-    fi
-
-    xmessage -buttons "Passt":0,"Abbruch":1 -default "Abbruch" -nearmouse "Target: $target. Prozessorzahl $msgCpu, Buildverzeichnis $msgBuild"
-    if [ $? = 1 ]
-    then
-        exit
     fi
 }
 
@@ -514,6 +484,9 @@ function removeGitPatches {
             git reset -q --hard
             git clean -q -fd
             cd "$SRC_DIR/$branch_dir"
+            echo - done
+        else
+            echo - not found
         fi
     done
 }
@@ -582,7 +555,7 @@ limitUsedCpu
 # BuildOrdner loeschen
 cleanBuild
 #Zusammenfassung
-showFeature
+#showFeature
 
 ##########################################################################################################
 # Repo init und sync
@@ -591,7 +564,7 @@ echo
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++ Init Repo +++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-repo init -u https://github.com/LineageOS/android.git -b cm-14.1
+$RepoCmd init -u https://github.com/LineageOS/android.git -b cm-14.1
 
 if [ $? -ne 0 ]
 then
@@ -605,7 +578,7 @@ then
     echo "+++++++++++++++++++++++++++++++++++ Sync Repo +++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo -c --force-remove-dirty --force-sync --verbose
-    repo sync -c --force-remove-dirty --force-sync --verbose
+    $RepoCmd sync -c --force-remove-dirty --force-sync --verbose
     echo
 
     if [ $? -ne 0 ]
@@ -694,8 +667,8 @@ do
     git pull
     LOCAL=$(grep -Eoi "^Version.*" ./README.mkdn | sed  s@'Version '@''@)
     echo Version: $LOCAL
-    echo
 
+    echo
     echo - kernel/bq/$kernel synchen
     cd $RootPfad/LOS/$patchfolder/android_kernel_bq_$kernel
     echo $PWD
@@ -706,8 +679,8 @@ do
     git pull
     LOCAL=$(grep -Eoi "EXTRAVERSION .*" ./Makefile | sed  s@'EXTRAVERSION ='@''@)
     echo Version: 3.10.108$LOCAL
-    echo
 
+    echo
     echo - external/ant-wireless synchen
     cd $RootPfad/LOS/$patchfolder/android_external_ant-wireless
     echo $PWD
@@ -718,8 +691,8 @@ do
     git pull
     LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
     echo Version: $LOCAL
-    echo
 
+    echo
     echo - vendor/bq/$target synchen
     cd $RootPfad/LOS/$AndroidPath/vendor/bq/$target
     echo $PWD
@@ -730,8 +703,8 @@ do
     git pull
     LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
     echo Version: $LOCAL
-    echo
 
+    echo
     echo - die modifizierten Dateien, die in das LOS kopiert werden
     cd $RootPfad/LOS/$patchfolder/modifizierte
     echo $PWD
@@ -742,8 +715,8 @@ do
     git pull
     LOCAL=$(grep -Eoi "^Version.*" ./README.md | sed  s@'Version '@''@)
     echo Version: $LOCAL
-    echo
 
+    echo
     #zurueck in den Pfad
     cd $lstPath
 
@@ -761,16 +734,16 @@ do
     cp -r $RootPfad/LOS/$patchfolder/android_kernel_bq_$kernel/ ./kernel/bq/$kernel/
     rm -rf kernel/bq/$kernel/.git
     echo - done
-    echo
 
+    echo
     echo - device/bq/$target kopieren
     rm -rf device/bq/$target
     [ ! -d ./device/bq ] &&  mkdir device/bq
     cp -r $RootPfad/LOS/$patchfolder/android_device_bq_$target/ ./device/bq/$target/
     rm -rf device/bq/$target/.git
     echo - done
-    echo
 
+#echo
 # Wird oben direkt ins ziel gesyncht
 #    echo - vendor/bq/$target kopieren
 #    rm -rf vendor/bq/$target
@@ -778,15 +751,15 @@ do
 #    cp -r $RootPfad/LOS/$patchfolder/$vendorFolder/gohan/ ./vendor/bq/$target/
 #    rm -rf vendor/bq/$target/.git
 #    echo - done
-    echo
 
+    echo
     echo - external/ant-wireless kopieren
     rm -rf external/ant-wireless
     cp -r $RootPfad/LOS/$patchfolder/android_external_ant-wireless/ ./external/ant-wireless/
     rm -rf external/ant-wireless/.git
     echo - done
-    echo
 
+    echo
     echo - vendor/cm/bootanimation kopieren
     cp -r $RootPfad/LOS/$patchfolder/modifizierte/BootAnimation/bootanimationRing/bootanimation.tar ./vendor/cm/bootanimation/bootanimation.tar
     echo - done
