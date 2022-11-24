@@ -102,8 +102,25 @@ applySecPatches=false
 #
 repoPick=false
 # der zu pickende Commit
-#gerritSecurityPatch=-t n-asb-2021-07 -t n-asb-2021-08 -t n-asb-2021-09 -t n-asb-2021-10 -t n-asb-2021-11 -t n-asb-2021-12 -t n-asb-2022-01 -t n-asb-2022-02
-#++++++++++++++++++++++++++++++++++#
+gerritSecurityPatch=(	n-asb-2021-07
+		      	n-asb-2021-08
+			n-asb-2021-09
+			n-asb-2021-10 
+			n-asb-2021-11
+			n-asb-2021-12
+			n-asb-2022-01 
+			n-asb-2022-02
+			n-asb-2022-03 
+			n-asb-2022-04 
+			n-asb-2022-05
+			n-asb-2022-06 
+			n-asb-2022-07 
+			n-asb-2022-08 
+			n-asb-2022-09
+			n-asb-2022-10
+			n-asb-2022-11
+)
+#+++++++++++++++++++++++++++++++++#
 
 ##########################################################################################################
 # Definitionen
@@ -253,8 +270,8 @@ function quit {
 ##########################################################################################################
 function applySecurityPatches {
 
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-07.sh
+#    cd  $RootPfad/LOS/Patches
+#    bash n-asb-2021-07.sh
     cd  $RootPfad/LOS/Patches
     bash n-asb-2021-08.sh
     cd  $RootPfad/LOS/Patches
@@ -587,18 +604,34 @@ then
     fi
 fi
 
-echo
-echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+++++++++++++++++++++++++++++++++++ Repo Cherry Pick ++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 if [ $applySecPatches = true ]
 then
+    echo
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++ Repo Cherry Pick ++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     applySecurityPatches
+    cd $RootPfad/LOS/$AndroidPath
 fi
 
 # Environment aufetzen
-cd $RootPfad/LOS/$AndroidPath
 source build/envsetup.sh
+if [ $repoPick = true ]
+then
+    echo
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++ Repo Cherry Pick ++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    
+    for patch in ${gerritSecurityPatch[@]}; do        
+        echo - repoPick -t $patch
+        repopick -t $patch
+        if [ $? -ne 0 ]
+        then
+            quit "repopick" "463"
+        fi
+    done
+fi
 
 ##########################################################################################################
 # Android Security Patch Level auslesen

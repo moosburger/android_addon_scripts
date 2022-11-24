@@ -5,8 +5,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo  - n-asb-2022-02
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
-cd ..
-cd lineage14.1
 
 cd system/bt
 git fetch https://github.com/LineageOS/android_system_bt refs/changes/56/323456/1 && git cherry-pick FETCH_HEAD --quiet

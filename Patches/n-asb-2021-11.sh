@@ -4,8 +4,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo  - n-asb-2021-11
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
-cd ..
-cd lineage14.1
 
 cd external/libnfc-nci
 git fetch https://github.com/LineageOS/android_external_libnfc-nci refs/changes/15/318515/1 && git cherry-pick FETCH_HEAD --quiet

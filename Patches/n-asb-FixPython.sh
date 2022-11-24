@@ -3,8 +3,7 @@ echo
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo  - n-asb-FixPython
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-cd ..
-cd lineage14.1
+echo
 
 cd vendor/cm
 git fetch https://github.com/LineageOS/android_build refs/changes/00/324000/1 && git checkout FETCH_HEAD --quiet

@@ -17,7 +17,7 @@ index 475b46029..cd8d11423 100644
      #  It must match one of the Android Security Patch Level strings of the Public Security Bulletins.
      #  If there is no $PLATFORM_SECURITY_PATCH set, keep it empty.
 -    PLATFORM_SECURITY_PATCH := 2021-07-05
-+    PLATFORM_SECURITY_PATCH := 2022-09-05
++    PLATFORM_SECURITY_PATCH := 2022-11-05
  endif
 
  ifeq "" "$(PLATFORM_BASE_OS)"

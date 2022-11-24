@@ -3,8 +3,7 @@ echo
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo  - n-asb-update-tzdb
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-cd ..
-cd lineage14.1
+echo
 
 cd bionic
 git fetch https://github.com/LineageOS/android_bionic refs/changes/73/317173/2 && git cherry-pick FETCH_HEAD --quiet

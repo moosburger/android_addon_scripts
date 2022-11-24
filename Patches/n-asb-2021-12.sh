@@ -4,8 +4,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo  - n-asb-2021-12
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
-cd ..
-cd lineage14.1
 
 cd external/tremolo
 git fetch https://github.com/LineageOS/android_external_tremolo refs/changes/86/319986/1 && git cherry-pick FETCH_HEAD --quiet

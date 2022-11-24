@@ -4,8 +4,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo  - n-asb-2021-09
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
-cd ..
-cd lineage14.1
 
 cd external/libavc
 git fetch https://github.com/LineageOS/android_external_libavc refs/changes/11/315711/1 && git cherry-pick FETCH_HEAD --quiet

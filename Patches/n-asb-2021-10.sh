@@ -4,8 +4,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo  - n-asb-2021-10
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
-cd ..
-cd lineage14.1
 
 cd external/sonivox
 git fetch https://github.com/LineageOS/android_external_sonivox refs/changes/38/317038/1 && git cherry-pick FETCH_HEAD --quiet
