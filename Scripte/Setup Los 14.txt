@@ -1,0 +1,46 @@
+
+#########################################################################################
+notwendige Tools, wenn Cinnamon über Wasta Linux oder so installiert wurde, 
+diese Repos aktivieren, sonst können die *-dev Dateien nicht installiert werden
+#########################################################################################
+sudo apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev openjdk-8-jdk abootimg libcurl4-openssl-dev nss-updatedb
+
+sudo apt-get install
+libwxgtk3.0-gtk3-dev
+
+#########################################################################################
+python2 als python
+#########################################################################################
+mit pyenv über shell
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+pyenv shell 2.7.18
+
+#########################################################################################
+Ant+
+#########################################################################################
+den modifzierten Ordner android_external_ant-wireless nach external/ant-wireless kopieren
+vorhandenen Ordner löschen
+neuen reinkopieren,
+.git Ordner darin dann löschen
+
+in device/bq/gohan/device.mk einfügen
+# Ant+ Support
+ifneq ($(BOARD_ANT_WIRELESS_DEVICE),)
+$(call inherit-product, external/ant-wireless/build/ant-wireless.mk)
+endif
+
+in device/bq/gohan/BoardConfig.mk einfügen
+export BOARD_ANT_WIRELESS_DEVICE='"qualcomm-smd"'
+
+#########################################################################################
+Security Patches
+#########################################################################################
+Am zuverlässigsten wäre es, immer das ganze Repo neu aufzusetzen,
+aktuell
+zuerst git cherry-pick --abort
+dann den Ordner löschen
+dann mein GetGitStatus.py laufen lassen
+Repo init
+Repo sync

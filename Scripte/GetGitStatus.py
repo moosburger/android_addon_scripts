@@ -137,7 +137,7 @@ def _gitDeleteBranch(repoDir, branch):
 def _main(argv):
 
     #try:
-    start = '/media/dejhgp07/Android/LOS/lineage14.1'
+    start = '/home/dejhgp07/Daten/LOS/lineage-14.1'
 
     lsFolder = glob.glob(start + "/*/")
     lsFolder.sort()
@@ -167,19 +167,23 @@ def _main(argv):
                         dirs[:] = []
                         break
 
-                if 'HEAD losgelöst bei' in result[i]:
+                if 'HEAD losgelöst bei' in result[i] or 'HEAD losgelöst von' in result[i]:
                     print ("{:45}  {}".format(result[i], root))
-                    print (f'-{result}\nindex: {i}')
+                    print (f'- result: {result}\nindex: {i}')
                     if '*' in result[i]:
 
                         # wechsle den branch
-                        print(root)
+                        print(f'root: {root}')
                         newResult = _gitCheckout(root, 'cm-14.1')
-                        msg = ''
-                        for i in range(0, len(newResult)):
-                            msg = "{:45}\n{:45}".format(msg, newResult[i].strip())
+                        print (f'newResult: {newResult}')
+                        #msg = ''
+                        #for i in range(0, len(newResult)):
+                        #    msg = "{:45}\n{:45}".format(msg, newResult[i].strip())
 
-                        print (msg)
+                        if 'error: Pfadspezifikation' in newResult[1]:
+                            print (f'branch: {result[2]}')
+                            newResult = _gitCheckout(root, result[2])
+
 
                         dirs[:] = []
                         break
@@ -229,7 +233,7 @@ def _main(argv):
         if len(dirs) > 0:
             print ("           {}".format(folder))
 
-        #~ print ("           {}           {}".format(folder, len(dirs)))
+        print ("           {}           {}".format(folder, len(dirs)))
 
     # #### Fehlerbehandlung #####################################################
     #except:

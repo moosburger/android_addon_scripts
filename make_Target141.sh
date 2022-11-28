@@ -73,7 +73,7 @@ AntPlusBuild=true
 #++++++++++++++++++++++++++++++++++#
 #++++++++++++++++++++++++++++++++++#
 # Beenden nachdem alles aktualisiert wurde
-checkBuildOnly=true
+checkBuildOnly=false
 #++++++++++++++++++++++++++++++++++#
 #++++++++++++++++++++++++++++++++++#
 
@@ -84,12 +84,31 @@ cleanOnly=false
 
 #++++++++++++++++++++++++++++++++++#
 # Synchen des Repos
-repoSync=false
+repoSync=true
 #++++++++++++++++++++++++++++++++++#
 
 #++++++++++++++++++++++++++++++++++#
 # Patches anwenden
-applySecPatches=false
+applySecPatches=true
+
+secPatches=(
+     n-asb-2021-07.sh
+     n-asb-2021-08.sh
+     n-asb-2021-09.sh
+     n-asb-2021-10.sh
+     n-asb-2021-11.sh
+     n-asb-2021-12.sh
+     n-asb-2022-01.sh
+     n-asb-2022-02.sh
+     n-asb-2022-03.sh
+     n-asb-2022-04.sh
+     n-asb-2022-05.sh
+     n-asb-2022-06.sh
+     n-asb-2022-08.sh
+     n-asb-2022-09.sh
+     n-asb-2022-10.sh
+     n-asb-2022-11.sh
+    )
 #++++++++++++++++++++++++++++++++++#
 
 #++++++++++++++++++++++++++++++++++#
@@ -102,24 +121,8 @@ applySecPatches=false
 #
 repoPick=false
 # der zu pickende Commit
-gerritSecurityPatch=(	n-asb-2021-07
-		      	n-asb-2021-08
-			n-asb-2021-09
-			n-asb-2021-10 
-			n-asb-2021-11
-			n-asb-2021-12
-			n-asb-2022-01 
-			n-asb-2022-02
-			n-asb-2022-03 
-			n-asb-2022-04 
-			n-asb-2022-05
-			n-asb-2022-06 
-			n-asb-2022-07 
-			n-asb-2022-08 
-			n-asb-2022-09
-			n-asb-2022-10
-			n-asb-2022-11
-)
+#gerritSecurityPatch=(#                            n-asb-2021-07#		      	n-asb-2021-08#			n-asb-2021-09#			n-asb-2021-10#			n-asb-2021-11#			n-asb-2021-12#			n-asb-2022-01#			n-asb-2022-02#			n-asb-2022-03#			n-asb-2022-04
+#			n-asb-2022-05#			n-asb-2022-06#			n-asb-2022-07#			n-asb-2022-08#			n-asb-2022-09#			n-asb-2022-10			#n-asb-2022-11#)
 #+++++++++++++++++++++++++++++++++#
 
 ##########################################################################################################
@@ -138,55 +141,58 @@ target=gohan
 kernel=msm8976
 cpuLmt=2
 rebuild=false
+manualSync=false
 
 vendorFolder="android_vendor_bq_gohan"
 
 patchfolder="packages"
+scriptFolder="android_14_addon_scripts"
 maxArrCnt=9
 declare -A FilePatch
 
 FilePatch[0,0]="ApnSettings"
-FilePatch[0,1]="$RootPfad/LOS/packages/modifizierte/ApnSetting/ApnSettings.patch"
+FilePatch[0,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/ApnSetting/ApnSettings.patch"
 FilePatch[0,2]="$RootPfad/LOS/$AndroidPath/packages/apps/Settings/"
 
 FilePatch[1,0]="Ant+"
-FilePatch[1,1]="$RootPfad/LOS/packages/modifizierte/Ant+/ant+AirplaneMode.patch"
+FilePatch[1,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Ant+/ant+AirplaneMode.patch"
 FilePatch[1,2]="$RootPfad/LOS/$AndroidPath/frameworks/base"
 
 FilePatch[2,0]="Base Ims"
-FilePatch[2,1]="$RootPfad/LOS/packages/modifizierte/Ims/Base_Ims.patch"
+FilePatch[2,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Ims/Base_Ims.patch"
 FilePatch[2,2]="$RootPfad/LOS/$AndroidPath/frameworks/base"
 
 FilePatch[3,0]="Opt_Net_Ims"
-FilePatch[3,1]="$RootPfad/LOS/packages/modifizierte/Ims/Opt_Net_Ims.patch"
+FilePatch[3,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Ims/Opt_Net_Ims.patch"
 FilePatch[3,2]="$RootPfad/LOS/$AndroidPath/frameworks/opt/net/ims"
 
 FilePatch[4,0]="Opt_Telephony_ims"
-FilePatch[4,1]="$RootPfad/LOS/packages/modifizierte/Ims/Opt_Telephony_Ims.patch"
+FilePatch[4,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Ims/Opt_Telephony_Ims.patch"
 FilePatch[4,2]="$RootPfad/LOS/$AndroidPath/frameworks/opt/telephony"
 
 FilePatch[5,0]="BqKamera Hack"
-FilePatch[5,1]="$RootPfad/LOS/packages/modifizierte/CameraHack/cameraHack.patch"
+FilePatch[5,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/CameraHack/cameraHack.patch"
 FilePatch[5,2]="$RootPfad/LOS/$AndroidPath/frameworks/base"
 
 FilePatch[6,0]="Signature Spoofing"
-FilePatch[6,1]="$RootPfad/LOS/packages/modifizierte/microG/microG.patch"
+FilePatch[6,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/microG/microG.patch"
 FilePatch[6,2]="$RootPfad/LOS/$AndroidPath/frameworks/base"
 
 FilePatch[7,0]="VPN Uebersetzungen"
-FilePatch[7,1]="$RootPfad/LOS/packages/modifizierte/Translations/cm_strings.patch"
+FilePatch[7,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Translations/cm_strings.patch"
 FilePatch[7,2]="$RootPfad/LOS/$AndroidPath/packages/apps/Settings"
 
 FilePatch[8,0]="Lautstaerke Aenderungen"
-FilePatch[8,1]="$RootPfad/LOS/packages/modifizierte/Loudness/default_volume_tables.patch"
+FilePatch[8,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Loudness/default_volume_tables.patch"
 FilePatch[8,2]="$RootPfad/LOS/$AndroidPath/frameworks/av"
 
 FilePatch[9,0]="Gohan update"
-FilePatch[9,1]="$RootPfad/LOS/packages/modifizierte/Patch/gohan-update.patch"
+FilePatch[9,1]="$RootPfad/LOS/$patchfolder/$scriptFolder/Patch/gohan-update.patch"
 FilePatch[9,2]="$RootPfad/LOS/packages/android_device_bq_$target"
 
 # Pfade zum resetten der Patches
-patchUndo=( "android"
+patchUndo=(
+            "android"
             "bionic"
             "build"
             "external/expat"
@@ -204,15 +210,17 @@ patchUndo=( "android"
             "packages/apps/Dialer"
             "packages/apps/KeyChain"
             "packages/apps/Nfc"
+            "packages/apps/PackageInstaller"
             "packages/apps/Settings"
             "packages/providers/ContactsProvider"
             "packages/providers/MediaProvider"
+            "packages/providers/TelephonyProvider"
             "packages/services/Telecomm"
             "system/bt"
             "system/core"
-            "vendor/cm"
             "frameworks/opt/net/ims"
             "frameworks/opt/telephony"
+            #"vendor/cm"
             #"external/ant-wireless"
 )
 
@@ -270,43 +278,19 @@ function quit {
 ##########################################################################################################
 function applySecurityPatches {
 
-#    cd  $RootPfad/LOS/Patches
-#    bash n-asb-2021-07.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-08.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-09.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-10.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-11.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2021-12.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-01.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-02.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-03.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-04.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-05.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-06.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-07.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-08.sh
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-2022-09.sh
+    for patch in ${secPatches[@]}; do
+        bash $RootPfad/LOS/$patchfolder/$scriptFolder/Patches/$patch
+        if [ $? -ne 0 ]
+        then
+            quit "repopick" "291"
+        fi
+    done
 
     # merge latest Time Zone Database
-    cd  $RootPfad/LOS/Patches
-    bash n-asb-update-tzdb.sh
+    bash  $RootPfad/LOS/$patchfolder/$scriptFolder/Patches/n-asb-update-tzdb.sh
 
     cd  $RootPfad/LOS/$AndroidPath/build
-    patch -p1 < $RootPfad/LOS/Patches/n-asb-set-security-patch-level.patch
+    patch -p1 <  $RootPfad/LOS/$patchfolder/$scriptFolder/Patches/n-asb-set-security-patch-level.patch
 
 }
 
@@ -351,7 +335,8 @@ function newPatchesAvailable {
     if [ ${#LOCAL} = 0 ]
     then
         echo - Kein Repo gefunden, manuell synchen!
-        exit
+        manualSync=true
+        #exit
     fi
 }
 
@@ -365,7 +350,12 @@ function whatToBuild {
     strLoc="${LOCAL//-/}"
     strRem="${REMOTE//-/}"
 
-    if (( $strLoc >= $strRem )); then
+
+    if [ $manualSync = true ]; then
+        xmessage -buttons "Beenden":1,"CleanPatches":2  -default "Beenden"-nearmouse "Repo muss neu gesynct werden!"
+        retVal=$?
+
+    elif (( $strLoc >= $strRem )); then
         xmessage -buttons "Trotzdem bauen":0,"Beenden":1,"CleanPatches":2  -default "Beenden"-nearmouse "Keine neuen Patches vorhanden"
         retVal=$?
         rebuild=true
@@ -492,20 +482,34 @@ function removeGitPatches {
     echo
     echo - remove Git Patches
 
+
     # Remove previous changes of vendor/lineage and frameworks/base (if they exist)
     # TODO: maybe reset everything using https://source.android.com/setup/develop/repo#forall
     for path in ${patchUndo[@]}; do
         echo $RootPfad/LOS/$AndroidPath/$path
         if [ -d "$RootPfad/LOS/$AndroidPath/$path" ]; then
             cd "$RootPfad/LOS/$AndroidPath/$path"
-            git reset -q --hard
-            git clean -q -fd
-            cd "$SRC_DIR/$branch_dir"
-            echo - done
+            git cherry-pick --abort
+            rm -rf "$RootPfad/LOS/$AndroidPath/$path"
+
+            #cd "$RootPfad/LOS/$AndroidPath/$path"
+            #$RepoCmd forall -vc "git reset --hard ; git clean -q -fdx"
+            #git reset -q --hard
+            #git clean -q -fdx
+            #rm -rf *
+            #$RepoCmd sync -l
+            #cd "$SRC_DIR/$branch_dir"
         else
             echo - not found
         fi
     done
+
+    echo - done
+
+     python3 $RootPfad/GetGitStatus.py
+
+    $RepoCmd init -u https://github.com/LineageOS/android.git -b cm-14.1
+    $RepoCmd sync
 }
 
 ##########################################################################################################
@@ -540,14 +544,14 @@ echo
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++ Build Optionen ++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "-  Anzahl Patches: $(($maxArrCnt + 1))"
-echo "- Ant+ integriert: $AntPlusBuild"
-echo "-Check Build Only: $checkBuildOnly"
-echo "-  Nur aufrauumen: $cleanOnly"
-echo "-    Repo synchen: $repoSync"
-echo "-       Repo Pick: $repoPick"
-echo "-  Patch anwenden: $applySecPatches"
-echo
+echo "-           Anzahl Patches: $(($maxArrCnt + 1))"
+echo "-          Ant+ integriert: $AntPlusBuild"
+echo "-         Check Build Only: $checkBuildOnly"
+echo "-           Nur aufrauumen: $cleanOnly"
+echo "-             Repo synchen: $repoSync"
+#echo "-                Repo Pick: $repoPick"
+echo "-Security Patches anwenden: $applySecPatches"
+#echo
 
 # was bauen
 whatToBuild
@@ -581,11 +585,24 @@ echo
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++ Init Repo +++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo - $RepoCmd init -u https://github.com/LineageOS/android.git -b cm-14.1
 $RepoCmd init -u https://github.com/LineageOS/android.git -b cm-14.1
 
 if [ $? -ne 0 ]
 then
     quit "repo Init" "$LINENO"
+fi
+
+if [ $manualSync = true ]
+then
+    echo sync
+    $RepoCmd sync
+    echo
+
+    if [ $? -ne 0 ]
+    then
+        quit "repo sync" "$LINENO"
+    fi
 fi
 
 if [ $repoSync = true ]
@@ -594,8 +611,12 @@ then
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++ Sync Repo +++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    echo -c --force-remove-dirty --force-sync --verbose
-    $RepoCmd sync -c --force-remove-dirty --force-sync --verbose
+    #echo - sync --verbose
+    #$RepoCmd sync --verbose
+
+     echo -c --force-remove-dirty --force-sync --verbose
+     $RepoCmd sync -c --force-remove-dirty --force-sync --verbose
+
     echo
 
     if [ $? -ne 0 ]
@@ -622,10 +643,10 @@ then
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++ Repo Cherry Pick ++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    
-    for patch in ${gerritSecurityPatch[@]}; do        
+
+    for patch in ${gerritSecurityPatch[@]}; do
         echo - repoPick -t $patch
-        repopick -t $patch
+        repopick -v -t $patch
         if [ $? -ne 0 ]
         then
             quit "repopick" "463"
@@ -739,7 +760,7 @@ do
 
     echo
     echo - die modifizierten Dateien, die in das LOS kopiert werden
-    cd $RootPfad/LOS/$patchfolder/modifizierte
+    cd $RootPfad/LOS/$patchfolder/$scriptFolder
     echo $PWD
     git config --get remote.origin.url
     git branch | grep \* | cut -d ' ' -f2
@@ -794,7 +815,8 @@ do
 
     echo
     echo - vendor/cm/bootanimation kopieren
-    cp -r $RootPfad/LOS/$patchfolder/modifizierte/BootAnimation/bootanimationRing/bootanimation.tar ./vendor/cm/bootanimation/bootanimation.tar
+    cp -r $RootPfad/LOS/$patchfolder/$scriptFolder/BootAnimation/bootanimationRing/bootanimation.tar ./vendor/cm/bootanimation/bootanimation.tar
+    cp -r $RootPfad/LOS/$patchfolder/$scriptFolder/BootAnimation/bootanimationRing/desc.txt ./vendor/cm/bootanimation/desc.txt
     echo - done
 
     echo
@@ -873,7 +895,7 @@ do
     echo
     croot
     python ./build/tools/releasetools/sign_target_files_apks -o -d $CertPfad/.android-certs $OUT/obj/PACKAGING/target_files_intermediates/*-target_files-*.zip $RootPfad/$target-files-signed.zip
-    sign_target_files_apks -o -d $CertPfad/.android-certs $OUT/obj/PACKAGING/target_files_intermediates/*-target_files-*.zip $RootPfad/$target-files-signed.zip
+    #sign_target_files_apks -o -d $CertPfad/.android-certs $OUT/obj/PACKAGING/target_files_intermediates/*-target_files-*.zip $RootPfad/$target-files-signed.zip
     if [ $? -ne 0 ]
     then
         echo - $target APK signieren schlug fehl
@@ -885,7 +907,7 @@ do
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo
     python ./build/tools/releasetools/ota_from_target_files -k $CertPfad/.android-certs/releasekey --block --backup=true $RootPfad/$target-files-signed.zip $RootPfad/$target-ota-update.zip
-    ota_from_target_files -k $CertPfad/.android-certs/releasekey --block --backup=true $RootPfad/$target-files-signed.zip $RootPfad/$target-ota-update.zip
+    #ota_from_target_files -k $CertPfad/.android-certs/releasekey --block --backup=true $RootPfad/$target-files-signed.zip $RootPfad/$target-ota-update.zip
     if [ $? -ne 0 ]
     then
         echo - $target OTA signieren schlug fehl
@@ -945,6 +967,6 @@ echo "+++++++++++++++++++++++++++++++++++ aufraeumen +++++++++++++++++++++++++++
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo
 restoreBuildEnv
-removeGitPatches
+#removeGitPatches
 
 ##########################################################################################################
